@@ -40,6 +40,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 
         $header = $cakeDescription;
         if($user == null) {
+            $header .= " | ".$this->Html->link('Register', '/users/add');
             $header .= " | ".$this->Html->link('Login', '/users/login');
         } else {
             $header .= " | ".$user['name']." (".$user['owner'].") | ".$this->Html->link('Logout', '/users/logout');
