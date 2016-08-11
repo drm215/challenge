@@ -21,73 +21,6 @@
             $this->set('weeks', $this->Week->find('all', array('fields' => array('id', 'name'), 'recursive' => 0)));
         }
 
-//         private function saveUserentry($userentry, $data) {
-//             if ($this->request->is(array('post', 'put'))) {
-
-//                 $schoolLocked = false;
-//                 if(isset($userentry['QB']['school_locked'])) {
-//                     $schoolLocked = $userentry['QB']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['qb_id'] = $data['Userentry']['qb_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['RB1']['school_locked'])) {
-//                     $schoolLocked = $userentry['RB1']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['rb1_id'] = $data['Userentry']['rb1_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['RB2']['school_locked'])) {
-//                     $schoolLocked = $userentry['RB2']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['rb2_id'] = $data['Userentry']['rb2_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['WR1']['school_locked'])) {
-//                     $schoolLocked = $userentry['WR1']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['wr1_id'] = $data['Userentry']['wr1_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['WR2']['school_locked'])) {
-//                     $schoolLocked = $userentry['WR2']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['wr2_id'] = $data['Userentry']['wr2_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['K']['school_locked'])) {
-//                     $schoolLocked = $userentry['K']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['k_id'] = $data['Userentry']['k_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['F']['school_locked'])) {
-//                     $schoolLocked = $userentry['F']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['f_id'] = $data['Userentry']['f_id'];
-//                 }
-//                 $schoolLocked = false;
-//                 if(isset($userentry['D']['school_locked'])) {
-//                     $schoolLocked = $userentry['D']['school_locked'];
-//                 }
-//                 if($schoolLocked == false) {
-//                     $userentry['Userentry']['d_id'] = $data['Userentry']['d_id'];
-//                 }
-
-//                 if ($this->Userentry->save($userentry)) {
-//                     $this->Session->setFlash(__('Your entry has been updated.'));
-//                     return $this->redirect(array('action' => 'index'));
-//                 }
-//             }
-//         }
-
         private function getGamesSchedule($weekId) {
             $this->Game = ClassRegistry::init('Game');
             return $this->Game->getGamesByWeek($weekId);
@@ -227,7 +160,6 @@
 
         $userentry = $this->getUserentry($weekId);
         $players = $this->Player->getAvailablePlayers();
-		//$players = array();
 
         if($this->request->is('post')) {
             if(empty($userentry)) {
@@ -298,7 +230,7 @@
 			
             $opponentID = $this->getOpponentID($player, $schedule);
             //$espnId = $player['Player']['School']['espn_id'];
-			$espnId = $schools[$player['Player']['school_id']]['espn_id'];
+						$espnId = $schools[$player['Player']['school_id']]['espn_id'];
             $opponent = "";
             if($opponentID != "") {
                 $opponent = '<img src="../../app/webroot/img/logos/' . $schools[$opponentID]['espn_id'] . '.png" title="' . $schools[$opponentID]['name'] . '">';
@@ -311,6 +243,8 @@
             } else {
                 $playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
             }
+					
+						$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
 
             array_push($data,
                 array(
@@ -318,6 +252,7 @@
                     $player['Player']['position'],
                     $espnId,
                     $button,
+										$teamImage,
                     $playerName,
                     $opponent,
                     $player[0]['SUM(points)'],

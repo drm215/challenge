@@ -8,19 +8,20 @@
         <table id="player-data" class="display compact" style="width: 100%">
             <thead>
                 <tr>
-					<th rowspan="2"></th>
-                    <th rowspan="2">ID</th>
-                    <th rowspan="2">Pos</th>
-                    <th rowspan="2"></th>
-                    <th rowspan="2">Player</th>
-                    <th rowspan="2">Opp</th>
-                    <th rowspan="2">Points</th>
-                    <th colspan="2">Passing</th>
-                    <th colspan="2">Rushing</th>
-                    <th colspan="2">Receiving</th>
-                    <th colspan="2">Return</th>
-                    <th colspan="2">Kicking</th>
-                    <th colspan="5">Defense</th>
+									<th rowspan="2"></th>
+                  <th rowspan="2">ID</th>
+                  <th rowspan="2">Pos</th>
+                  <th rowspan="2"></th>
+									<th rowspan="2">Team</th>
+                  <th rowspan="2">Player</th>
+                  <th rowspan="2">Opp</th>
+                  <th rowspan="2">Points</th>
+                  <th colspan="2">Passing</th>
+                  <th colspan="2">Rushing</th>
+                  <th colspan="2">Receiving</th>
+                  <th colspan="2">Return</th>
+                  <th colspan="2">Kicking</th>
+                  <th colspan="5">Defense</th>
                 </tr>
                 <tr>
                     <th class="offense">Yards</th>
