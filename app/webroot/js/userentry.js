@@ -196,7 +196,7 @@ var playerData = {
     },
     selectPlayer: function(id) {
         var data = playerData.data[playerData.getBasePosition($('#hidden-position').val())].data[id];
-        var playerName = data[4].slice(0, data[4].indexOf('<br/>'));
+        var playerName = data[5].slice(0, data[5].indexOf('<br/>'));
         var position = $('.highlight').attr('id').split('-')[0];
         playerData.setSelectedPlayer(position, data[0], playerName, playerData.getTooltip($('#hidden-position').val(), id));
         playerData.validatePlayersUnique();
