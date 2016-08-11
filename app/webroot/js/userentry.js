@@ -18,7 +18,7 @@ var playerData = {
                 }
              },
              "dataType": "json",
-             "order": [5, 'desc'],
+             "order": [7, 'desc'],
              "columnDefs": [{
                  "targets": [0,1,2],
                  "visible": false
