@@ -94,7 +94,7 @@
             $position = $columns[2]->plaintext;
 
             $player = null;
-            $players = $this->find('all', array('conditions' => array('name' => $name), 'recursive' => -1));
+            $players = $this->find('all', array('conditions' => array('name' => $name, 'school_id' => $schoolId, 'position' => $position), 'recursive' => -1));
 
             if(count($players) == 0) {
                 $player = $this->create();

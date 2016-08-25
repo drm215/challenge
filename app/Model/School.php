@@ -45,18 +45,19 @@
 				$espnLink = $schoolLink->href;
 				$bPos = strlen("http://www.espn.com/college-football/team/_/id/");
 				$espnId = substr($espnLink, $bPos, strpos($espnLink, "/", $bPos + 1) - $bPos);
-
-				$school = $this->create();
-				$school['School']['conference_id'] = $conferenceId['Conference']['id'];
-				$school['School']['espn_id'] = $espnId;
-
+				
+				$school = $this->find('first', array('conditions' => array('espn_id' => $espnId), 'recursive' => -1));
+				if($school === NULL || empty($school)) {
+					$school = $this->create();	
+					$school['School']['conference_id'] = $conferenceId['Conference']['id'];
+					$school['School']['espn_id'] = $espnId;
+				}
 				$this->espnProcessSchoolAndRoster($school);
 			}
 		}
 
 		private function espnProcessSchoolAndRoster($school) {
 			pr('begin espnProcessSchoolAndRoster');
-			pr($school);
 			$html = file_get_html("http://www.espn.com/college-football/team/roster/_/id/".$school['School']['espn_id']);
 			if($html === FALSE) { 
 				pr("error!");
@@ -64,12 +65,11 @@
 				$school['School']['name'] = $html->find('a[class=sub-brand-title]',0)->plaintext;
 				$school = $this->espnSaveSchool($school, $html);
 			}
-			
-			
 			pr('end espnProcessSchoolAndRoster');
 		}
 
 		private function espnProcessSchoolRoster($school, $html) {
+			echo "Processing roster.\n";
 			$playerTable = $html->find('table[class=tablehead]',0);
 			$playerRows = $playerTable->find('tr');
 			for($i = 2; $i < count($playerRows); $i++) {
@@ -85,8 +85,6 @@
 				if($this->save($school)) {
 					echo $school['School']['name']." saved successfully.\n";
 					$school['School']['id'] = $this->id;
-					
-					$this->espnProcessSchoolRoster($school, $html);
 				} else {
 					echo $school['School']['name']." not saved successfully.\n";
 				}
@@ -94,6 +92,7 @@
 				echo $school['School']['name']." is being skipped because it already exists.\n";
 				$school['School']['id'] = $tempSchool['School']['id'];
 			}
+			$this->espnProcessSchoolRoster($school, $html);
 			pr('end espnSaveSchool');
 			return $school;
 		}
