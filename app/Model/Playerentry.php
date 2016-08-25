@@ -19,7 +19,7 @@
         private function espnProcessWeek($weekId) {
           echo "Begin espnProcessWeek: " . $weekId . "\n";
           $playerEntries = array();
-          $games = $this->Game->find('all', array('conditions' => array('week_id' => $weekId, 'parsed' => false, 'time < DATE_SUB(NOW(), INTERVAL 3 HOUR)'), 'recursive' => -1));
+          $games = $this->Game->find('all', array('conditions' => array('week_id' => $weekId, 'parsed' => false, 'time < DATE_SUB(NOW(), INTERVAL 3.5 HOUR)'), 'recursive' => -1));
           $parsedGames = array();
           $schools = $this->School->find('list', array('conditions' => array('NOT' => array('conference_id' => 0)), 'fields' => array('id')));
           echo "Found " . count($games) . " to process.\n";
