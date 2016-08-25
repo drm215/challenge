@@ -5,7 +5,7 @@
 
         public function parser($weekId = null) {
             App::import('Vendor', 'simple_html_dom', array('file'=>'simple_html_dom.php'));
-			$this->School = ClassRegistry::init('School');
+						$this->School = ClassRegistry::init('School');
 
             if($weekId == null) {
                 $weeks = $this->Week->find('list');
@@ -43,11 +43,12 @@
         }
 
         private function espnProcessWeekGame($gameTr, $weekId) {
-			pr('begin espnProcessWeekGame');
+						pr('begin espnProcessWeekGame');
             $tds = $gameTr->find('td');
             $awaySchoolId = $this->getSchoolId($tds[0]);
             $homeSchoolId = $this->getSchoolId($tds[1]);
-			$date = $this->processEspnDate($tds[2]->outertext);
+					
+						$date = $this->processEspnDate($tds[2]->outertext);
 
             $existingGame = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
             if(empty($existingGame)) {
@@ -59,8 +60,9 @@
                 $game = $existingGame;
             }
             $game['Game']['espn_id'] = $this->getEspnId($tds[2]->find('a', 0)->href, "/college-football/game?gameId=");
-            $game['Game']['time'] =  $this->processEspnDate($tds[2]->outertext);
+            $game['Game']['time'] =  $date;
 
+						pr($game);
             $this->espnSaveGame($game);
         }
 		
@@ -107,9 +109,9 @@
 
         private function processEspnDate($wordyDate) {
             $start = strpos($wordyDate, 'data-date="') + strlen('data-date="');
-			$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
-			$date = substr($wordyDate, $start, $end - $start);
-			return $date;
+						$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
+						$date = (new DateTime(substr($wordyDate, $start, $end - $start)))->modify('-4 hours');
+						return $date->format('Y-m-d H:i:s');
         }
 
         private function switchMonth($text) {
