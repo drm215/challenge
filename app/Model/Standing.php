@@ -9,8 +9,9 @@
 				
 				$this->Userentry = ClassRegistry::init('Userentry');
 				$this->Playerentry = ClassRegistry::init('Playerentry');
-				
-				$userentries = $this->Userentry->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::write('current.year')), 'recursive' => -1));
+				echo "Current year: " . Configure::read('current.year') . "\n";
+				$userentries = $this->Userentry->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::read('current.year')), 'recursive' => -1));
+				echo "Found " . count($userentries) . " to calculate.\n";
 				foreach($userentries as $entry) {
 					$playersArray = array($entry['Userentry']['qb_id'],$entry['Userentry']['rb1_id'],$entry['Userentry']['rb2_id'],$entry['Userentry']['wr1_id'],$entry['Userentry']['wr2_id'],$entry['Userentry']['f_id'],$entry['Userentry']['k_id'],$entry['Userentry']['d_id']);				
 					$points = $this->Playerentry->getTotalPointsByWeek($weekId, $playersArray);
