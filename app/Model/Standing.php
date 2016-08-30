@@ -16,10 +16,11 @@
 					$playersArray = array($entry['Userentry']['qb_id'],$entry['Userentry']['rb1_id'],$entry['Userentry']['rb2_id'],$entry['Userentry']['wr1_id'],$entry['Userentry']['wr2_id'],$entry['Userentry']['f_id'],$entry['Userentry']['k_id'],$entry['Userentry']['d_id']);				
 					$points = $this->Playerentry->getTotalPointsByWeek($weekId, $playersArray);
 					
-					$standing = $this->find('first', array('conditions' => array('week_id' => $weekId, 'user_id' => $entry['Userentry']['user_id'], 'year' => Configure::write('current.year')), 'recursive' => -1));
+					$standing = $this->find('first', array('conditions' => array('week_id' => $weekId, 'user_id' => $entry['Userentry']['user_id'], 'year' => Configure::read('current.year')), 'recursive' => -1));
 					if(count($standing) == 0) {
 						$standing['Standing']['user_id'] = $entry['Userentry']['user_id'];
 						$standing['Standing']['week_id'] = $weekId;
+						$standing['Standing']['year'] = Configure::read('current.year');
 					}
 					if(isset($points['points'])) {
 						$standing['Standing']['points'] = $points['points'];

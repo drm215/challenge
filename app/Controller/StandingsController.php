@@ -3,7 +3,7 @@
 
 		public function index() {
 			$this->Week = ClassRegistry::init('Week');
-			$standings = $this->Standing->find('all', array('conditions' => array('Week.lock_time < NOW()', 'year' => Configure::write('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
+			$standings = $this->Standing->find('all', array('conditions' => array('Week.lock_time < NOW()', 'year' => Configure::read('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
 
 			$totalPointsArray = array();
 			$detailsArray = array();
@@ -93,7 +93,7 @@
 				if($weekId == null) {
 					$weekId = $week['Week']['id'];
 				}
-				$standings = $this->Standing->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::write('current.year')), 'fields' => array('SUM(Standing.points) AS points', 'User.name', 'User.owner, User.wins, User.id'), 'group' => array('Standing.user_id'), 'order' => array('points DESC')));
+				$standings = $this->Standing->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::read('current.year')), 'fields' => array('SUM(Standing.points) AS points', 'User.name', 'User.owner, User.wins, User.id'), 'group' => array('Standing.user_id'), 'order' => array('points DESC')));
 				$otherWeeks = $this->Week->find('all', array('conditions' => array('Week.lock_time < NOW()', 'id !=' => $weekId), 'order' => array('Week.lock_time ASC'), 'recursive' => -1));
 				
 			}
