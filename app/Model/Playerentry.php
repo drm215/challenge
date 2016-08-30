@@ -61,7 +61,7 @@
           }
           if(!$errors) {
             foreach ($games as $game) {
-              $game['Game']['parsed'] = 1;
+              $game['Game']['parsed'] = TRUE;
               if(!$this->Game->save($game)) {
                   pr($game);
                   debug($this->validationErrors);

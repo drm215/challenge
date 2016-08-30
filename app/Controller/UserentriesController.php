@@ -176,7 +176,7 @@
             $userentry['Userentry']['f_id'] = $this->request->data['f-id'];
             $userentry['Userentry']['k_id'] = $this->request->data['k-id'];
             $userentry['Userentry']['d_id'] = $this->request->data['d-id'];
-			$userentry['Userentry']['year'] = Configure::read('current.year');
+						$userentry['Userentry']['year'] = Configure::read('current.year');
 
             if ($this->Userentry->save($userentry)) {
                 $this->Session->setFlash(__('Your picks has been saved.'));
