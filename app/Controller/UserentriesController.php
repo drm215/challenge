@@ -93,67 +93,30 @@
 
         $this->Week = ClassRegistry::init('Week');
         $this->Playerentry = ClassRegistry::init('Playerentry');
+				$this->School = ClassRegistry::init('School');
+				$this->Player = ClassRegistry::init('Player');
 
-        $record = $this->Userentry->find('first', array('conditions' => array('user_id' => $UserId, 'week_id' => $weekId, 'year' => Configure::read('current.year'))));
-
-        if($this->Auth->user('id') != $UserId) {
-            $week = $this->Week->find('first', array('conditions' => array('id' => $weekId), 'recursive' => -1));
-
-            $lockedTime = strtotime($week['Week']['lock_time']);
-            if(time() - $lockedTime < 0) {
-
-                foreach ($record as $key => $val) {
-                    if($key != 'Userentry' && $key != 'Week' && $key != 'User') {
-                        switch($key) {
-                                case "QB":
-                                    $translatedKey = "qb_id";
-                                    break;
-                                case "RB1":
-                                    $translatedKey = "rb1_id";
-                                    break;
-                                case "RB2":
-                                    $translatedKey = "rb2_id";
-                                    break;
-                                case "WR1":
-                                    $translatedKey = "wr1_id";
-                                    break;
-                                case "WR2":
-                                    $translatedKey = "wr2_id";
-                                    break;
-                                case "F":
-                                    $translatedKey = "f_id";
-                                    break;
-                                case "K":
-                                    $translatedKey = "k_id";
-                                    break;
-                                case "D":
-                                    $translatedKey = "d_id";
-                                    break;
-                            }
-
-                        if(!in_array($val['school'], array_keys($locks))) {
-                            $record[$key] = "";
-                            $record['Userentry'][$translatedKey] = "";
-                        }
-                        if(isset($locks[$val['school']]) && (time() - strtotime($locks[$val['school']])) < 0) {
-                            $record[$key] = "";
-                            $record['Userentry'][$translatedKey] = "";
-                        }
-                    }
-                }
-            }
-        }
+        $record = $this->Userentry->find('first', array('conditions' => array('user_id' => $UserId, 'week_id' => $weekId, 'Userentry.year' => Configure::read('current.year'))));
+				$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], '', $weekId);
+				$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], '', $weekId);	
+				$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], '', $weekId);
+				$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], '', $weekId);
+				$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], '', $weekId);
+				$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], '', $weekId);
+				$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], '', $weekId);
+				$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], '', $weekId);
 
         $this->set('title', $record['User']['name']." (".$record['User']['owner'].") - Week ".$record['Week']['name']);
         $this->set('record', $record);
 
-        $playerEntries = $this->Playerentry->getplayerentries($record['Userentry']);
+        $playerEntries = $this->Playerentry->getplayerentries($record['Userentry'], false, 1);
         $this->set('playerentries', $playerEntries);
 
         $playersArray = array($record['Userentry']['qb_id'],$record['Userentry']['rb1_id'],$record['Userentry']['rb2_id'],$record['Userentry']['wr1_id'],$record['Userentry']['wr2_id'],$record['Userentry']['f_id'],$record['Userentry']['k_id'],$record['Userentry']['d_id']);
         $points = $this->Playerentry->getTotalPointsByWeek($record['Userentry']['week_id'], $playersArray);
         $calculatedPoints = $points['points'] == "" ? "0" : $points['points'];
         $this->set('totalPoints', $calculatedPoints);
+				$this->set('schools', $this->School->findAndAdjustIndex());
     }
 
     public function beforeFilter() {

@@ -370,24 +370,20 @@
                 return $points[0];
             }
         }
-        public function getPlayerEntries($userentry) {
+        public function getPlayerEntries($userentry, $unbindPlayer = true, $recursive = 0) {
             $playerEntries = array();
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['QB'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['qb_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['RB1'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['rb1_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['RB2'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['rb2_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['WR1'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['wr1_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['WR2'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['wr2_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['F'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['f_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['K'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['k_id']), 'recursive' => 0));
-            $this->unbindModel(array('belongsTo' => array('Week', 'Player')));
-            $playerEntries['D'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['d_id']), 'recursive' => 0));
+            if($unbindPlayer) {
+              $this->unbindModel(array('belongsTo' => array('Player')));
+            }
+            $this->unbindModel(array('belongsTo' => array('Week')));
+            $playerEntries['QB'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['qb_id']), 'recursive' => $recursive));
+            $playerEntries['RB1'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['rb1_id']), 'recursive' => $recursive));
+            $playerEntries['RB2'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['rb2_id']), 'recursive' => $recursive));
+            $playerEntries['WR1'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['wr1_id']), 'recursive' => $recursive));
+            $playerEntries['WR2'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['wr2_id']), 'recursive' => $recursive));
+            $playerEntries['F'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['f_id']), 'recursive' => $recursive));
+            $playerEntries['K'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['k_id']), 'recursive' => $recursive));
+            $playerEntries['D'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['d_id']), 'recursive' => $recursive));
             return $playerEntries;
         }
         public function beforeSave($options = array()) {

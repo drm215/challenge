@@ -1,5 +1,4 @@
 <h3><?php echo $title; ?></h3>
-
 <table>
 	<tr>
 		<th colspan="3">Players</th>
@@ -36,24 +35,24 @@
 
 
 <?php
-	printColumns('QB', $playerentries, $record);
-	printColumns('RB1', $playerentries, $record);
-	printColumns('RB2', $playerentries, $record);
-	printColumns('WR1', $playerentries, $record);
-	printColumns('WR2', $playerentries, $record);
-	printColumns('F', $playerentries, $record);
-	printColumns('K', $playerentries, $record);
-	printColumns('D', $playerentries, $record);
+	printColumns('QB', $playerentries, $record, $schools);
+	printColumns('RB1', $playerentries, $record, $schools);
+	printColumns('RB2', $playerentries, $record, $schools);
+	printColumns('WR1', $playerentries, $record, $schools);
+	printColumns('WR2', $playerentries, $record, $schools);
+	printColumns('F', $playerentries, $record, $schools);
+	printColumns('K', $playerentries, $record, $schools);
+	printColumns('D', $playerentries, $record, $schools);
 ?>
 	<tr><td>Total</td><td colspan="16"/><td><td><?php echo $totalPoints; ?></td></tr>
 </table>
 <?php 
 	
-	function printColumns($position, $playerentries, $player) {
-		if(!empty($player[strtoupper($position)]['position'])) {		
+	function printColumns($position, $playerentries, $player, $schools) {
+		if(isset($player[$position]['locked']) && $player[$position]['locked'] == 1) {
 			echo "<tr><td>".$player[strtoupper($position)]['position']."</td>";
 			echo "<td>".$player[strtoupper($position)]['name']."</td>";
-			echo "<td>".$player[strtoupper($position)]['school']."</td>";
+			echo "<td>".$schools[$playerentries[$position]['Player']['school_id']]['name']."</td>";
 			printColumn($position, 'pass_yards', $playerentries);
 			printColumn($position, 'pass_tds', $playerentries);
 			printColumn($position, 'rush_yards', $playerentries);
