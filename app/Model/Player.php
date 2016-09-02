@@ -18,7 +18,7 @@
 
                 $game = $this->Game->find('first', array('recursive' => -1, 'conditions' => array('week_id' => $weekId, 'OR' => array('away_school_id' => $player['School']['id'], 'home_school_id' => $player['School']['id']))));
                 if(!empty($game)) {
-                    $lockedTime = strtotime($game['Game']['time']) - 10 * 60;
+                    $lockedTime = strtotime($game['Game']['time']) - (10 * 60);
                     if(time() > $lockedTime) {
                         return true;
                     }

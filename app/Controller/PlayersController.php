@@ -89,5 +89,27 @@
 
             //$this->set('players', $this->Player->find('all', array('recursive' => -1)));
         }
+      
+        public function test($weekId, $playerId) {
+          $this->Game = ClassRegistry::init('Game');
+          echo "Week Id = " . $weekId . "\n";
+          echo "Player Id = " . $playerId . "\n";
+          
+          $player = $this->Player->find('first', array('conditions' => array('Player.id' => $playerId)));
+          pr($player);
+          
+          echo "Player Name = " . $player['Player']['name'] . "\n";
+          $locked = $this->Player->isPlayerLocked($playerId, '', $weekId);
+          echo "Player is ";
+          echo $locked == 1 ? " locked.\n" : " not locked.\n";
+          $game = $this->Game->find('first', array('conditions' => array('away_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
+          if(empty($game)) {
+            $game = $this->Game->find('first', array('conditions' => array('home_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
+          }
+          $lockedTime = strtotime($game['Game']['time']) - (10 * 60);
+          echo date(DATE_RSS, $lockedTime);
+         
+          
+        }
     }
 ?>
