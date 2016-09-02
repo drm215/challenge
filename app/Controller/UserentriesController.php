@@ -26,22 +26,22 @@
             return $this->Game->getGamesByWeek($weekId);
         }
 
-        private function copyPlayerDataFromPlayers($players, $userentry) {
-            $userentry = $this->copyPlayerData('qb', '', $players, $userentry);
-            $userentry = $this->copyPlayerData('rb', '1', $players, $userentry);
-            $userentry = $this->copyPlayerData('rb', '2', $players, $userentry);
-            $userentry = $this->copyPlayerData('wr', '1', $players, $userentry);
-            $userentry = $this->copyPlayerData('wr', '2', $players, $userentry);
-            $userentry = $this->copyPlayerData('f', '', $players, $userentry);
-            $userentry = $this->copyPlayerData('k', '', $players, $userentry);
-            $userentry = $this->copyPlayerData('d', '', $players, $userentry);
+        private function copyPlayerDataFromPlayers($players, $userentry, $schools) {
+            $userentry = $this->copyPlayerData('qb', '', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('rb', '1', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('rb', '2', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('wr', '1', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('wr', '2', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('f', '', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('k', '', $players, $userentry, $schools);
+            $userentry = $this->copyPlayerData('d', '', $players, $userentry, $schools);
             return $userentry;
         }
 
-        private function copyPlayerData($position, $secondaryPosition, $players, $userentry) {
+        private function copyPlayerData($position, $secondaryPosition, $players, $userentry, $schools) {
             if($userentry['Userentry'][$position.$secondaryPosition.'_id'] != null && $userentry['Userentry'][$position.$secondaryPosition.'_id'] != "") {
                 $userentry[strtoupper($position).$secondaryPosition] = $players[strtoupper($position)][$userentry['Userentry'][$position.$secondaryPosition.'_id']]['Player'];
-                $userentry[strtoupper($position).$secondaryPosition]['School'] = $players[strtoupper($position)][$userentry['Userentry'][$position.$secondaryPosition.'_id']]['Player']['School'];
+                $userentry[strtoupper($position).$secondaryPosition]['School'] = $schools[$players[strtoupper($position)][$userentry['Userentry'][$position.$secondaryPosition.'_id']]['Player']['school_id']];
             }
             return $userentry;
         }
@@ -191,7 +191,7 @@
                 // reselect to re-fetch the associations
                 $userentry = $this->getUserentry($weekId);
             } else {
-                $userentry = $this->copyPlayerDataFromPlayers($players, $userentry);
+                $userentry = $this->copyPlayerDataFromPlayers($players, $userentry, $this->School->findAndAdjustIndex());
                //debug($this->Userentry->validationErrors);
             }
         }

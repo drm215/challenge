@@ -144,7 +144,12 @@
 
         public function validatePlayerNotLocked($playerId, $position) {
             $this->Player = ClassRegistry::init('Player');
-            return !$this->Player->isPlayerLocked($playerId[$position], $position, $this->data['Userentry']['week_id']);
+            $previous = $this->find('first', array('conditions' => array('id' =>  $this->data['Userentry']['id']), 'recursive' => -1));
+            if($previous['Userentry'][$position] ==  $this->data['Userentry'][$position]) {
+              return true;
+            } else {
+              return !$this->Player->isPlayerLocked($playerId[$position], $position, $this->data['Userentry']['week_id']);
+            }
         }
 
         public function validatePlayerUnique($playerId, $positionOne, $positionTwo, $positionThree) {
