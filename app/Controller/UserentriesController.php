@@ -276,7 +276,7 @@
             $label = "Inactive";
         } else if(isset($schedule[$player['Player']['school_id']])) {
             $game = $schedule[$player['Player']['school_id']]['Game'];
-            $lockedTime = strtotime($game['time']) - 10 * 60;
+            $lockedTime = strtotime($game['time']) - (10 * 60) - (4 * 60 * 60);
             if(time() < $lockedTime) {
                 $label = "Select";
             }
