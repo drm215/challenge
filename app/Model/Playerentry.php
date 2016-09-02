@@ -212,19 +212,59 @@
           if($processAway) {
             $div = $container->find('div[class=column-one]', 0);
             $table = $div->find('table[class=mod-data]', 0);
-            $playerEntries = $this->espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId, 'away', $game['Game']['away_school_id']);
+            $playerEntries = $this->espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId);
           }
           if($processHome) {
             $div = $container->find('div[class=column-two]', 0);
             $table = $div->find('table[class=mod-data]', 0);
-            $playerEntries = $this->espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId, 'home', $game['Game']['home_school_id']);
+            $playerEntries = $this->espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId);
           }
           return $playerEntries;
         }
       
-        private function espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId, $schoolId) {
+        private function espnProcessBoxScoreKickingContainer($html, $container, $processAway, $processHome, $playerEntries, $weekId, $game) {
+          if($processAway) {
+            $div = $container->find('div[class=column-one]', 0);
+            $table = $div->find('table[class=mod-data]', 0);
+            $playerEntries = $this->espnProcessBoxScoreKickingTable($table, $playerEntries, $weekId, $game['Game']['away_school_id']);
+          }
+          if($processHome) {
+            $div = $container->find('div[class=column-two]', 0);
+            $table = $div->find('table[class=mod-data]', 0);
+            $playerEntries = $this->espnProcessBoxScoreKickingTable($table, $playerEntries, $weekId, $game['Game']['home_school_id']);
+          }
+          return $playerEntries;
+        }
+      
+        private function espnProcessBoxScoreKickingTable($table, $playerEntries, $weekId, $schoolId) {
+          $tbody = $table->find('tbody',0);
+          $row = $tbody->find('tr[class=highlight]', 0);
+          
+          $player = $this->Player->find('first', array('conditions' => array('position' => 'K', 'school_id' => $schoolId), 'recursive' => -1));
+          $id = $player['Player']['id'];
+          $playerentry = $this->getPlayerentry($playerEntries, $id, $weekId);
+          $temp = $row->find('td[class=fg]',0);
+          if($temp != null) {
+              $array = explode("/", $temp->plaintext);
+              if(count($array) == 2) {
+                  $playerentry['Playerentry']['field_goals'] = $array[0];
+              }
+          }
+          $temp = $row->find('td[class=xp]',0);
+          if($temp != null) {
+              $array = explode("/", $temp->plaintext);
+              if(count($array) == 2) {
+                  $playerentry['Playerentry']['pat'] = $array[0];
+              }
+          }
+          $playerEntries[$id] = $playerentry;
+          return $playerEntries;
+        }
+      
+        private function espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId) {
           $tbody = $table->find('tbody',0);
           $rows = $tbody->find('tr');
+          
           foreach($rows as $row) {
             $nameTd = $row->find('td[class=name]',0);
             if($nameTd != null) {
@@ -233,12 +273,7 @@
                 echo "Link could not be found.  Dumping contents of td: " . $nameTd->plaintext;
               } else {
                 $espnId = substr($nameLink->href, strrpos($nameLink->href, "/") + 1);
-                echo $espnId."\n";
-                if($category == 'kicking') {
-                  $player = $this->Player->find('first', array('conditions' => array('name' => 'Kickers', 'school_id' => $schoolId), 'recursive' => -1));
-                } else {
-                  $player = $this->Player->find('first', array('conditions' => array('espn_id' => $espnId), 'recursive' => -1));
-                }
+                $player = $this->Player->find('first', array('conditions' => array('espn_id' => $espnId), 'recursive' => -1));
                 if(empty($player)) {
                   echo "Player " . $nameTd->plaintext . " could not be found in the database. \n";
                 } else {
@@ -250,22 +285,7 @@
                       $id = $player['Player']['id'];
                       $playerentry = $this->getPlayerentry($playerEntries, $id, $weekId);
 
-                      if("kicking" == $category) {
-                          $temp = $row->find('td[class=fg]',0);
-                          if($temp != null) {
-                              $array = explode("/", $temp->plaintext);
-                              if(count($array) == 2) {
-                                  $playerentry['Playerentry']['field_goals'] = $array[0];
-                              }
-                          }
-                          $temp = $row->find('td[class=xp]',0);
-                          if($temp != null) {
-                              $array = explode("/", $temp->plaintext);
-                              if(count($array) == 2) {
-                                  $playerentry['Playerentry']['pat'] = $array[0];
-                              }
-                          }
-                      } else if("kickReturns" == $category) {
+                      if("kickReturns" == $category) {
                           $temp = $row->find('td[class=td]',0);
                           if($temp != null) {
                               $kReturnTds = $temp->plaintext;
@@ -320,13 +340,14 @@
             echo "Processing home school: " . $game['Game']['home_school_id']."\n";
             $processHome = true;
           }
+          
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-passing]", 0), $processAway, $processHome, 'pass', $playerEntries, $weekId, $game);
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-rushing]", 0), $processAway, $processHome, 'rush', $playerEntries, $weekId, $game);
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-receiving]", 0), $processAway, $processHome, 'receive', $playerEntries, $weekId, $game);
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-interceptions]", 0), $processAway, $processHome, 'interceptions', $playerEntries, $weekId, $game);
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-kickReturns]", 0), $processAway, $processHome, 'kickReturns', $playerEntries, $weekId, $game);
           $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-puntReturns]", 0), $processAway, $processHome, 'puntReturns', $playerEntries, $weekId, $game);
-          $playerEntries = $this->espnProcessBoxScoreContainer($html, $html->find("div[id=gamepackage-kicking]", 0), $processAway, $processHome, 'kicking', $playerEntries, $weekId, $game);
+          $playerEntries = $this->espnProcessBoxScoreKickingContainer($html, $html->find("div[id=gamepackage-kicking]", 0), $processAway, $processHome, $playerEntries, $weekId, $game);
           return $playerEntries;
         }
         
