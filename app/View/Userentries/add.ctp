@@ -57,14 +57,38 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="qb-row" class="highlight"><td><a class="toggle-position" id="QB">QB</a></td><td><span id="qb-player-name"></span><span id="qb-player-name-error" class="player-data-error"></span></td><td id="qb-player-points" style="text-align:right"></td></tr>
-                <tr id="rb1-row"><td><a class="toggle-position" id="RB1">RB1</a></td><td id="rb1"><span id="rb1-player-name"></span><span id="rb1-player-name-error" class="player-data-error"></span></td><td id="rb1-player-points" style="text-align:right"></td></tr>
-                <tr id="rb2-row"><td><a class="toggle-position" id="RB2">RB2</a></td><td><span id="rb2-player-name"></span><span id="rb2-player-name-error" class="player-data-error"></span></td><td id="rb2-player-points" style="text-align:right"></td></tr>
-                <tr id="wr1-row"><td><a class="toggle-position" id="WR1">WR1</a></td><td><span id="wr1-player-name"></span><span id="wr1-player-name-error" class="player-data-error"></span></td><td id="wr1-player-points" style="text-align:right"></td></tr>
-                <tr id="wr2-row"><td><a class="toggle-position" id="WR2">WR2</a></td><td><span id="wr2-player-name"></span><span id="wr2-player-name-error" class="player-data-error"></span></td><td id="wr2-player-points" style="text-align:right"></td></tr>
-                <tr id="f-row"><td><a class="toggle-position" id="F">F</a></td><td><span id="f-player-name"></span><span id="f-player-name-error" class="player-data-error"></span></td><td id="f-player-points" style="text-align:right"></td></tr>
-                <tr id="k-row"><td><a class="toggle-position" id="K">K</a></td><td><span id="k-player-name"></span><span id="k-player-name-error" class="player-data-error"></span></td><td id="k-player-points" style="text-align:right"></td></tr>
-                <tr id="d-row"><td><a class="toggle-position" id="D">D</a></td><td><span id="d-player-name"></span><span id="d-player-name-error" class="player-data-error"></span></td><td id="d-player-points" style="text-align:right"></td></tr>
+                <tr id="qb-row" class="highlight">
+									<td><?php echo $userentry['QB']['locked'] == 1 ? 'QB' : '<a class="toggle-position" id="QB">QB</a>'; ?></td>
+									<td><span id="qb-player-name"></span><span id="qb-player-name-error" class="player-data-error"></span></td>
+									<td id="qb-player-points" style="text-align:right"></td></tr>
+                <tr id="rb1-row">
+									<td><?php echo $userentry['RB1']['locked'] == 1 ? 'RB1' : '<a class="toggle-position" id="RB1">RB1</a>'; ?></td>
+									<td id="rb1"><span id="rb1-player-name"></span><span id="rb1-player-name-error" class="player-data-error"></span></td>
+									<td id="rb1-player-points" style="text-align:right"></td></tr>
+                <tr id="rb2-row">
+									<td><?php echo $userentry['RB2']['locked'] == 1 ? 'RB2' : '<a class="toggle-position" id="RB2">RB2</a>'; ?></td>
+									<td><span id="rb2-player-name"></span><span id="rb2-player-name-error" class="player-data-error"></span></td>
+									<td id="rb2-player-points" style="text-align:right"></td></tr>
+                <tr id="wr1-row">
+									<td><?php echo $userentry['WR1']['locked'] == 1 ? 'WR1' : '<a class="toggle-position" id="WR1">WR1</a>'; ?></td>
+									<td><span id="wr1-player-name"></span><span id="wr1-player-name-error" class="player-data-error"></span></td>
+									<td id="wr1-player-points" style="text-align:right"></td></tr>
+                <tr id="wr2-row">
+									<td><?php echo $userentry['WR2']['locked'] == 1 ? 'WR2' : '<a class="toggle-position" id="WR2">WR2</a>'; ?></td>
+									<td><span id="wr2-player-name"></span><span id="wr2-player-name-error" class="player-data-error"></span></td>
+									<td id="wr2-player-points" style="text-align:right"></td></tr>
+                <tr id="f-row">
+									<td><?php echo $userentry['F']['locked'] == 1 ? 'F' : '<a class="toggle-position" id="F">F</a>'; ?></td>
+									<td><span id="f-player-name"></span><span id="f-player-name-error" class="player-data-error"></span></td>
+									<td id="f-player-points" style="text-align:right"></td></tr>
+                <tr id="k-row">
+									<td><?php echo $userentry['K']['locked'] == 1 ? 'K' : '<a class="toggle-position" id="K">K</a>'; ?></td>
+									<td><span id="k-player-name"></span><span id="k-player-name-error" class="player-data-error"></span></td>
+									<td id="k-player-points" style="text-align:right"></td></tr>
+                <tr id="d-row">
+									<td><?php echo $userentry['D']['locked'] == 1 ? 'D' : '<a class="toggle-position" id="D">D</a>'; ?></td>
+									<td><span id="d-player-name"></span><span id="d-player-name-error" class="player-data-error"></span></td>
+									<td id="d-player-points" style="text-align:right"></td></tr>
                 <tr><td><strong>Total</strong></td><td></td><td id="total-player-points" style="text-align:right"></td></tr>
             </tbody>
         </table>
@@ -89,7 +113,7 @@
 <script>
     $(document).ready(function() {
         playerData.initialize(
-                JSON.parse('<?php echo $userentry; ?>'),
+                JSON.parse('<?php echo json_encode($userentry, JSON_HEX_APOS); ?>'),
                 JSON.parse('<?php echo $playerentries; ?>'),
                 '<?php echo $this->params['pass'][0]; ?>',
                 '<?php echo AuthComponent::user('id'); ?>',

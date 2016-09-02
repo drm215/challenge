@@ -58,6 +58,14 @@
             $this->Userentry->D->unbindModel(array('hasMany' => array('Playerentry')));
 
             $userentry = $this->Userentry->find('first', array('conditions' => array('week_id' => $weekId, 'user_id' => $this->Auth->user('id'), 'Userentry.year' => Configure::read('current.year')), 'recursive' => 2));
+						$userentry['QB']['locked'] = $this->Player->isPlayerLocked($userentry['QB']['id'], '', $weekId);
+						$userentry['RB1']['locked'] = $this->Player->isPlayerLocked($userentry['RB1']['id'], '', $weekId);	
+						$userentry['RB2']['locked'] = $this->Player->isPlayerLocked($userentry['RB2']['id'], '', $weekId);
+						$userentry['WR1']['locked'] = $this->Player->isPlayerLocked($userentry['WR1']['id'], '', $weekId);
+						$userentry['WR2']['locked'] = $this->Player->isPlayerLocked($userentry['WR2']['id'], '', $weekId);
+						$userentry['F']['locked'] = $this->Player->isPlayerLocked($userentry['F']['id'], '', $weekId);
+						$userentry['K']['locked'] = $this->Player->isPlayerLocked($userentry['K']['id'], '', $weekId);
+						$userentry['D']['locked'] = $this->Player->isPlayerLocked($userentry['D']['id'], '', $weekId);
             return $userentry;
         }
 
@@ -193,7 +201,7 @@
             $playerentries = $this->Playerentry->getPlayerentries($userentry['Userentry']);
         }
 
-        $this->set('userentry', json_encode($userentry, JSON_HEX_APOS));
+        $this->set('userentry', $userentry);
         $this->set('players', json_encode($players, JSON_HEX_APOS));
         $this->set('playerentries', json_encode($playerentries, JSON_HEX_APOS));
     }
