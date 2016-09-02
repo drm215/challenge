@@ -97,14 +97,26 @@
 				$this->Player = ClassRegistry::init('Player');
 
         $record = $this->Userentry->find('first', array('conditions' => array('user_id' => $UserId, 'week_id' => $weekId, 'Userentry.year' => Configure::read('current.year'))));
-				$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], '', $weekId);
-				$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], '', $weekId);	
-				$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], '', $weekId);
-				$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], '', $weekId);
-				$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], '', $weekId);
-				$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], '', $weekId);
-				$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], '', $weekId);
-				$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], '', $weekId);
+				if($this->Auth->user('id') == $UserId) {
+					$record['QB']['locked'] = 1;
+					$record['RB1']['locked'] = 1;
+					$record['RB2']['locked'] = 1;
+					$record['WR1']['locked'] = 1;
+					$record['WR2']['locked'] = 1;
+					$record['F']['locked'] = 1;
+					$record['K']['locked'] = 1;
+					$record['D']['locked'] = 1;
+				} else {
+					$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], '', $weekId);
+					$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], '', $weekId);	
+					$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], '', $weekId);
+					$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], '', $weekId);
+					$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], '', $weekId);
+					$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], '', $weekId);
+					$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], '', $weekId);
+					$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], '', $weekId);
+				}
+				
 
         $this->set('title', $record['User']['name']." (".$record['User']['owner'].") - Week ".$record['Week']['name']);
         $this->set('record', $record);
