@@ -7,7 +7,11 @@
 		/**
         Server side validation that the player is locked.
         **/
-        public function isPlayerLocked($id, $position, $weekId) {			
+        public function isPlayerLocked($id, $weekId, $currentTime = null) {
+						if($currentTime == NULL) {
+							$currentTime = new DateTime();
+						}
+						echo $currentTime->format(DATE_RSS);
             $this->Game = ClassRegistry::init('Game');
 
             $this->unbindModel(array('hasMany' => array('Playerentry')));
@@ -18,8 +22,9 @@
 
                 $game = $this->Game->find('first', array('recursive' => -1, 'conditions' => array('week_id' => $weekId, 'OR' => array('away_school_id' => $player['School']['id'], 'home_school_id' => $player['School']['id']))));
                 if(!empty($game)) {
-                    $lockedTime = strtotime($game['Game']['time']) - (10 * 60) - (4 * 60 * 60);
-                    if(time() > $lockedTime) {
+                    //$lockedTime = strtotime($game['Game']['time']) + (10 * 60) - (4 * 60 * 60);
+										$lockedTime = (new DateTime($game['Game']['time']))->modify('-10 minutes');
+                    if($currentTime > $lockedTime) {
                         return true;
                     }
                 }
@@ -59,7 +64,7 @@
         private function getAvailablePlayersByPosition($position) {
             $this->Playerentry->unbindModel(array('belongsTo' => array('Week')));
             $this->unbindModel(array('hasMany' => array('Playerentry')));
-			$this->unbindModel(array('belongsTo' => array('School')));
+						$this->unbindModel(array('belongsTo' => array('School')));
             $tempPlayerEntries = $this->Playerentry->find('all',
                 array(
                     'conditions' => array('position' => $position, 'Player.year' => Configure::read('current.year')),

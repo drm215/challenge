@@ -148,7 +148,7 @@
             if($previous['Userentry'][$position] ==  $this->data['Userentry'][$position]) {
               return true;
             } else {
-              return !$this->Player->isPlayerLocked($playerId[$position], $position, $this->data['Userentry']['week_id']);
+              return !$this->Player->isPlayerLocked($playerId[$position], $this->data['Userentry']['week_id']);
             }
         }
 

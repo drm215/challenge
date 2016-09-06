@@ -110,7 +110,8 @@
         private function processEspnDate($wordyDate) {
             $start = strpos($wordyDate, 'data-date="') + strlen('data-date="');
 						$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
-						$date = (new DateTime(substr($wordyDate, $start, $end - $start)))->modify('-4 hours');
+						$date = (new DateTime(substr($wordyDate, $start, $end - $start), new DateTimeZone("America/New_York")))->modify('-4 hours');
+						echo $date->format(DATE_RSS);
 						return $date->format('Y-m-d H:i:s');
         }
 

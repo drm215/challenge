@@ -112,7 +112,7 @@
 		
 		public function validatePlayerNotLocked($playerId, $position, $weekId) {
 			$this->Player = ClassRegistry::init('Player');
-			return !$this->Player->isPlayerLocked($playerId, $position, $weekId);
+			return !$this->Player->isPlayerLocked($playerId, $weekId);
 		}
 		
 		public function validatePlayerUnique($playerId, $positionOne, $positionTwo, $positionThree) {

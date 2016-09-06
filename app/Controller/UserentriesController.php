@@ -58,14 +58,14 @@
             $this->Userentry->D->unbindModel(array('hasMany' => array('Playerentry')));
 
             $userentry = $this->Userentry->find('first', array('conditions' => array('week_id' => $weekId, 'user_id' => $this->Auth->user('id'), 'Userentry.year' => Configure::read('current.year')), 'recursive' => 2));
-						$userentry['QB']['locked'] = $this->Player->isPlayerLocked($userentry['QB']['id'], '', $weekId);
-						$userentry['RB1']['locked'] = $this->Player->isPlayerLocked($userentry['RB1']['id'], '', $weekId);	
-						$userentry['RB2']['locked'] = $this->Player->isPlayerLocked($userentry['RB2']['id'], '', $weekId);
-						$userentry['WR1']['locked'] = $this->Player->isPlayerLocked($userentry['WR1']['id'], '', $weekId);
-						$userentry['WR2']['locked'] = $this->Player->isPlayerLocked($userentry['WR2']['id'], '', $weekId);
-						$userentry['F']['locked'] = $this->Player->isPlayerLocked($userentry['F']['id'], '', $weekId);
-						$userentry['K']['locked'] = $this->Player->isPlayerLocked($userentry['K']['id'], '', $weekId);
-						$userentry['D']['locked'] = $this->Player->isPlayerLocked($userentry['D']['id'], '', $weekId);
+						$userentry['QB']['locked'] = $this->Player->isPlayerLocked($userentry['QB']['id'], $weekId);
+						$userentry['RB1']['locked'] = $this->Player->isPlayerLocked($userentry['RB1']['id'], $weekId);	
+						$userentry['RB2']['locked'] = $this->Player->isPlayerLocked($userentry['RB2']['id'], $weekId);
+						$userentry['WR1']['locked'] = $this->Player->isPlayerLocked($userentry['WR1']['id'], $weekId);
+						$userentry['WR2']['locked'] = $this->Player->isPlayerLocked($userentry['WR2']['id'], $weekId);
+						$userentry['F']['locked'] = $this->Player->isPlayerLocked($userentry['F']['id'], $weekId);
+						$userentry['K']['locked'] = $this->Player->isPlayerLocked($userentry['K']['id'], $weekId);
+						$userentry['D']['locked'] = $this->Player->isPlayerLocked($userentry['D']['id'], $weekId);
             return $userentry;
         }
 
@@ -107,14 +107,14 @@
 					$record['K']['locked'] = 1;
 					$record['D']['locked'] = 1;
 				} else {
-					$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], '', $weekId);
-					$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], '', $weekId);	
-					$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], '', $weekId);
-					$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], '', $weekId);
-					$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], '', $weekId);
-					$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], '', $weekId);
-					$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], '', $weekId);
-					$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], '', $weekId);
+					$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], $weekId);
+					$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], $weekId);	
+					$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], $weekId);
+					$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], $weekId);
+					$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], $weekId);
+					$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], $weekId);
+					$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], $weekId);
+					$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], $weekId);
 				}
 				
 
@@ -147,10 +147,11 @@
         if($this->request->is('post')) {
             if(empty($userentry)) {
                 $userentry = $this->Userentry->create();
-                $userentry['Userentry']['week_id'] = $weekId;
-                $userentry['Userentry']['user_id'] = $this->Auth->user('id');
+                
                 //$userentry['Userentry']['playoff_fl'] = $week['Week']['playoff_fl'];
             }
+						$userentry['Userentry']['week_id'] = $weekId;
+            $userentry['Userentry']['user_id'] = $this->Auth->user('id');
             $userentry['Userentry']['qb_id'] = $this->request->data['qb-id'];
             $userentry['Userentry']['rb1_id'] = $this->request->data['rb1-id'];
             $userentry['Userentry']['rb2_id'] = $this->request->data['rb2-id'];

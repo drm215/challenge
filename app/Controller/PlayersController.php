@@ -92,22 +92,28 @@
       
         public function test($weekId, $playerId) {
           $this->Game = ClassRegistry::init('Game');
-          echo "Week Id = " . $weekId . "\n";
-          echo "Player Id = " . $playerId . "\n";
+          echo "Week Id = " . $weekId . "<br/>";
+          echo "Player Id = " . $playerId . "<br/>";
           
           $player = $this->Player->find('first', array('conditions' => array('Player.id' => $playerId)));
-          pr($player);
-          
-          echo "Player Name = " . $player['Player']['name'] . "\n";
-          $locked = $this->Player->isPlayerLocked($playerId, '', $weekId);
+          echo "Player Name = " . $player['Player']['name'] . "<br/>";
+          $locked = $this->Player->isPlayerLocked($playerId, $weekId);
           echo "Player is ";
-          echo $locked == 1 ? " locked.\n" : " not locked.\n";
-          $game = $this->Game->find('first', array('conditions' => array('away_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
-          if(empty($game)) {
-            $game = $this->Game->find('first', array('conditions' => array('home_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
-          }
-          $lockedTime = strtotime($game['Game']['time']) - (10 * 60);
-          echo date(DATE_RSS, $lockedTime);
+          echo $locked == 1 ? " locked.<br/>" : " not locked.<br/>";
+          
+          $locked = $this->Player->isPlayerLocked($playerId, $weekId, new DateTime('2016-09-10 20:00:00'));
+          echo "Player is ";
+          echo $locked == 1 ? " locked.<br/>" : " not locked.<br/>";
+          
+          $locked = $this->Player->isPlayerLocked($playerId, $weekId, new DateTime('2016-09-10 19:45:00'));
+          echo "Player is ";
+          echo $locked == 1 ? " locked.<br/>" : " not locked.<br/>";
+         // $game = $this->Game->find('first', array('conditions' => array('away_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
+         // if(empty($game)) {
+         //   $game = $this->Game->find('first', array('conditions' => array('home_school_id' => $player['Player']['school_id'], 'week_id' => $weekId), 'recursive' => -1));
+         // }
+         //$lockedTime = strtotime($game['Game']['time']) - (10 * 60);
+         // echo date(DATE_RSS, $lockedTime);
          
           
         }
