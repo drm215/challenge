@@ -11,7 +11,6 @@
 						if($currentTime == NULL) {
 							$currentTime = new DateTime();
 						}
-						echo $currentTime->format(DATE_RSS);
             $this->Game = ClassRegistry::init('Game');
 
             $this->unbindModel(array('hasMany' => array('Playerentry')));
