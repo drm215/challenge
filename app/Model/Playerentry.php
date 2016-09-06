@@ -12,8 +12,8 @@
             $this->espnProcessWeek($weekId);
             
             $this->Standing = ClassRegistry::init('Standing');
-            $this->Standing->calculateStandingsByWeek($weekId);
-            $this->Standing->updateLowestWeek();
+            //$this->Standing->calculateStandingsByWeek($weekId);
+            //$this->Standing->updateLowestWeek();
         }
       
         private function espnProcessWeek($weekId) {
@@ -119,10 +119,10 @@
         private function espnProcessDefensiveScoring($playerEntries, $weekId, $schools, $game) {
           echo "espnProcessDefensiveScoring\n";
             
-          $url = "http://www.espn.com/college-football/playbyplay?gameId=".$game['Game']['id'];
+          $url = "http://www.espn.com/college-football/playbyplay?gameId=".$game['Game']['espn_id'];
           $html = file_get_html($url);
 
-          $scoringSummaryDiv = $html->find('div[class=scoring-summary]', 0);
+          $scoringSummaryDiv = $html->find('div[id=scoring-summary]', 0);
           if($scoringSummaryDiv != null) {
             $rows = $scoringSummaryDiv->find('tr');
                 
