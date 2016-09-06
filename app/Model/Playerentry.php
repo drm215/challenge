@@ -12,8 +12,8 @@
             $this->espnProcessWeek($weekId);
             
             $this->Standing = ClassRegistry::init('Standing');
-            //$this->Standing->calculateStandingsByWeek($weekId);
-            //$this->Standing->updateLowestWeek();
+            $this->Standing->calculateStandingsByWeek($weekId);
+            $this->Standing->updateLowestWeek();
         }
       
         private function espnProcessWeek($weekId) {
