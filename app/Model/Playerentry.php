@@ -122,7 +122,7 @@
           $url = "http://www.espn.com/college-football/playbyplay?gameId=".$game['Game']['espn_id'];
           $html = file_get_html($url);
 
-          $scoringSummaryDiv = $html->find('div[id=scoring-summary]', 0);
+          $scoringSummaryDiv = $html->find('div[class=scoring-summary]', 0);
           if($scoringSummaryDiv != null) {
             $rows = $scoringSummaryDiv->find('tr');
                 
