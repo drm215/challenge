@@ -69,6 +69,23 @@
 				} 
 			} 
 			return TRUE; 
-		} 
+		}
+		
+		public function updateUserWins() {
+			$this->updateAll(array('wins' => 0));
+			
+			$wins = array();
+			$this->Week = ClassRegistry::init('Week');
+			$this->Standing = ClassRegistry::init('Standing');
+			$weeks = $this->Week->find('list', array('fields' => array('id')));
+			foreach($weeks as $week) {
+				$standing = $this->Standing->find('first', array('fields' => array('user_id'), 'conditions' => array('week_id' => $week), 'order' => array('points DESC'), 'recursive' => -1));
+				if(isset($standing['Standing'])) {
+					$user = $this->find('first', array('fields' => array('id', 'wins'), 'conditions' => array('id' => $standing['Standing']['user_id']), 'recursive' => -1));
+					$user['User']['wins'] = $user['User']['wins'] + 1;
+					$this->save($user);
+				}
+			}
+		}
 	}
 ?>

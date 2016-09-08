@@ -9,7 +9,6 @@
 				
 				$this->Userentry = ClassRegistry::init('Userentry');
 				$this->Playerentry = ClassRegistry::init('Playerentry');
-				echo "Current year: " . Configure::read('current.year') . "\n";
 				$userentries = $this->Userentry->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::read('current.year')), 'recursive' => -1));
 				echo "Found " . count($userentries) . " to calculate.\n";
 				foreach($userentries as $entry) {
@@ -27,7 +26,6 @@
 					} else {
 						$standing['Standing']['points'] = 0;
 					}
-					
 					if(!$this->save($standing)) {
 						echo "Error!\n";
 						
@@ -43,10 +41,10 @@
 			$this->updateAll(array('lowest' => 0));
 		
 			$this->User = ClassRegistry::init('User');
-			$Users = $this->User->find('list', array('fields' => array('id')));
-			foreach($Users as $User) {
+			$users = $this->User->find('list', array('fields' => array('id')));
+			foreach($users as $user) {
 				
-				$lowest = $this->find('first', array('conditions' => array('user_id' => $User, 'year' => Configure::write('current.year')), 'order' => array('points ASC'), 'recursive' => -1));
+				$lowest = $this->find('first', array('conditions' => array('user_id' => $user, 'year' => Configure::read('current.year')), 'order' => array('points ASC'), 'recursive' => -1));
 				$lowest['Standing']['lowest'] = 1;
 				
 				if(!$this->save($lowest)) {

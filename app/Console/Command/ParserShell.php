@@ -27,7 +27,7 @@ App::uses('Shell', 'Console');
  */
 class ParserShell extends AppShell {
 
-    public $uses = array('Playerentry', 'Player', 'School', 'Game');
+    public $uses = array('Playerentry', 'Player', 'School', 'Game', 'User');
     
     public function test() {
         echo "This is a test.";
@@ -63,4 +63,8 @@ class ParserShell extends AppShell {
         $this->Game->parser($weekId);
         echo "Ending Player gamesParser\n";
     }
+  
+    public function updateUserWins() {
+		  $this->User->updateUserWins();
+	  }
 }

@@ -67,7 +67,6 @@
 					$detailsArray[$key]['behind_playoff'] = $behindPlayoffs;
 				}
 			}
-
 			$this->set('detailsArray', $detailsArray);
 			$this->set('totalPointsArray', $totalPointsArray);
 			$this->set('weeks', $this->Week->find('list', array('conditions' => 'lock_time < NOW()')));
@@ -102,8 +101,8 @@
 		}
 
 		public function playoffs() {
-			$standings = $this->Standing->find('all', array('conditions' => array('Week.playoff_fl = 0', 'year' => Configure::write('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
-			$playoffStandings = $this->Standing->find('all', array('conditions' => array('Week.playoff_fl = 1', 'year' => Configure::write('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
+			$standings = $this->Standing->find('all', array('conditions' => array('Week.playoff_fl = 0', 'year' => Configure::read('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
+			$playoffStandings = $this->Standing->find('all', array('conditions' => array('Week.playoff_fl = 1', 'year' => Configure::read('current.year')), 'fields' => array('Standing.week_id', 'Standing.points', 'User.id', 'User.name', 'User.owner', 'User.wins')));
 			$detailsArray = array();
 			$regularPointsArray = array();
 			foreach($standings as $standing) {
