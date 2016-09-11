@@ -211,10 +211,10 @@
         $buttonId = 0;
         // loop through all the player records and build the json array
         foreach($players[$position] as $player) {
-			
+			CakeLog::write('debug', $position);
             $opponentID = $this->getOpponentID($player, $schedule);
             //$espnId = $player['Player']['School']['espn_id'];
-						$espnId = $schools[$player['Player']['school_id']]['espn_id'];
+			$espnId = $schools[$player['Player']['school_id']]['espn_id'];
             $opponent = "";
             if($opponentID != "") {
                 $opponent = '<img src="../../app/webroot/img/logos/' . $schools[$opponentID]['espn_id'] . '.png" title="' . $schools[$opponentID]['name'] . '">';
@@ -222,15 +222,14 @@
 
             $button = '';
             $playerName = $player['Player']['name'].'<br/>'.$this->getPlayerSchool($player);
-			CakeLog::write('debug', 'position locked' . $userentry[$position]['locked']);
-			if($userentry[$position]['locked'] != true) {
+			if($userentry['QB']['locked'] != true || $userentry['RB1']['locked'] != true || $userentry['RB2']['locked'] != true || $userentry['WR1']['locked'] != true || $userentry['WR2']['locked'] != true || $userentry['F']['locked'] != true || $userentry['K']['locked'] != true || $userentry['D']['locked'] != true) {
 				if(!isset($userentries[$position][$player['Player']['id']])) {
 					$button = $this->getButton($player, $schedule, $buttonId);
 				} else {
 					$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
 				}
 			}		
-						$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
+			$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
 
             array_push($data,
                 array(
