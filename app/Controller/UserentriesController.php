@@ -187,10 +187,10 @@
    }
 
     public function getPlayerData($weekId, $userId, $position, $debug = false) {
-        CakeLog::write('debug', "getPlayerData:");
-        CakeLog::write('debug', "weekId: " . $weekId);
-        CakeLog::write('debug', "userId: " . $userId);
-        CakeLog::write('debug', "position: " . $position);
+        //CakeLog::write('debug', "getPlayerData:");
+        //CakeLog::write('debug', "weekId: " . $weekId);
+        //CakeLog::write('debug', "userId: " . $userId);
+        //CakeLog::write('debug', "position: " . $position);
       
         if(!$debug) {
           $layout = 'ajax'; //<-- No LAYOUT VERY IMPORTANT!!!!!
@@ -201,7 +201,7 @@
         $this->Week = ClassRegistry::init('Week');
         $this->School = ClassRegistry::init('School');
 
-        //$userentry = $this->getUserentry($weekId);
+        $userentry = $this->getUserentry($weekId);
         $players = $this->Player->getAvailablePlayers();
         $schedule = $this->getGamesSchedule($weekId);
         $schools = $this->School->findAndAdjustIndex();
@@ -221,13 +221,15 @@
             }
 
             $button = '';
-            $playerName = $playerName = $player['Player']['name'].'<br/>'.$this->getPlayerSchool($player);
-            if(!isset($userentries[$position][$player['Player']['id']])) {
-                $button = $this->getButton($player, $schedule, $buttonId);
-            } else {
-                $playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
-            }
-					
+            $playerName = $player['Player']['name'].'<br/>'.$this->getPlayerSchool($player);
+			CakeLog::write('debug', 'position locked' . $userentry[$position]['locked']);
+			if($userentry[$position]['locked'] != true) {
+				if(!isset($userentries[$position][$player['Player']['id']])) {
+					$button = $this->getButton($player, $schedule, $buttonId);
+				} else {
+					$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
+				}
+			}		
 						$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
 
             array_push($data,
@@ -260,7 +262,7 @@
             $buttonId++;
         }
         $json = '{"data":'.$this->safe_json_encode($data).'}';
-		CakeLog::write('debug', "json: " . $json);
+		//CakeLog::write('debug', "json: " . $json);
         return $json;
     }
 
@@ -272,15 +274,20 @@
     }
 
     private function getButtonLabel($player, $schedule) {
+		$this->Player = ClassRegistry::init('Player');
         $label = "Locked";
         if(empty($schedule)) {
             $label = "Inactive";
         } else if(isset($schedule[$player['Player']['school_id']])) {
             $game = $schedule[$player['Player']['school_id']]['Game'];
-            $lockedTime = strtotime($game['time']) - (10 * 60) - (4 * 60 * 60);
-            if(time() < $lockedTime) {
-                $label = "Select";
+			$currentTime = new DateTime();
+			$lockedTime = (new DateTime($game['time']))->modify('-10 minutes');
+			if($currentTime < $lockedTime) {
+				$label = "Select";
             }
+			//CakeLog::write('debug', 'Player = ' . $player['Player']['name']);
+			//CakeLog::write('debug', 'Current Time = ' . $currentTime->format('Y-m-d H:i:s'));
+			//CakeLog::write('debug', 'Game Time = ' . $lockedTime->format('Y-m-d H:i:s'));
         } else {
             $label = "Inactive";
         }

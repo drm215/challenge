@@ -12,6 +12,8 @@
 							$currentTime = new DateTime();
 						}
             $this->Game = ClassRegistry::init('Game');
+			
+			//CakeLog::write('debug', "Begin isPlayerLocked");
 
             $this->unbindModel(array('hasMany' => array('Playerentry')));
             $this->School->unbindModel(array('hasMany' => array('Player')));
@@ -22,7 +24,12 @@
                 $game = $this->Game->find('first', array('recursive' => -1, 'conditions' => array('week_id' => $weekId, 'OR' => array('away_school_id' => $player['School']['id'], 'home_school_id' => $player['School']['id']))));
                 if(!empty($game)) {
                     //$lockedTime = strtotime($game['Game']['time']) + (10 * 60) - (4 * 60 * 60);
-										$lockedTime = (new DateTime($game['Game']['time']))->modify('-10 minutes');
+					$lockedTime = (new DateTime($game['Game']['time']))->modify('-10 minutes');//->modify('-4 hours');
+					
+					//CakeLog::write('debug', );
+					//CakeLog::write('debug', 'Player = ' . $player['Player']['name']);
+					//CakeLog::write('debug', 'Current Time = ' . $currentTime->format('Y-m-d H:i:s'));
+					//CakeLog::write('debug', 'Game Time = ' . $lockedTime->format('Y-m-d H:i:s'));
                     if($currentTime > $lockedTime) {
                         return true;
                     }
