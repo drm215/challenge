@@ -22,8 +22,10 @@
             echo "Processing Week " . $weekId . "\n";
             $url = "http://www.espn.com/college-football/schedule/_/week/" . $weekId;
             echo "URL = " . $url . "\n";
-            //$url = "file:///C:/Users/damagee/Desktop/espn.html";
-            $this->espnProcessWeekByDays(file_get_html($url), $weekId);
+						$html = file_get_html($url);
+            $this->espnProcessWeekByDays($html, $weekId);
+						$html->clear(); 
+						unset($html);
         }
 
         private function espnProcessWeekByDays($html, $weekId) {

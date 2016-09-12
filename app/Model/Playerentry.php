@@ -40,6 +40,8 @@
             } else {
               echo "Skipping because something unexpected happened.\n";
             }
+            $html->clear(); 
+						unset($html);
           }
           
           $this->savePlayerEntries($playerEntries, $parsedGames);
