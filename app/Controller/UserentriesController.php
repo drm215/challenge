@@ -301,7 +301,7 @@
 				$element = '';
 				if(!$previouslyPlayed) {
 					$buttonLabel = $this->getButtonLabel($player, $schedule);
-        	$disabled = $this->getDisabledAttribute($positionLocked);
+        	$disabled = $this->getDisabledAttribute($positionLocked, $buttonLabel);
 					$element = '<button id="'.$buttonId.'"'.$disabled.' class="select-player">'.$buttonLabel.'</button>';
 				}
 				return $element;
@@ -325,9 +325,9 @@
       return $label;
     }
 
-    private function getDisabledAttribute($positionLocked) {
+    private function getDisabledAttribute($positionLocked, $buttonLabel) {
         $class = '';
-        if($positionLocked) {
+        if($positionLocked || $buttonLabel == 'Inactive' || $buttonLabel == 'Locked') {
             $class = " disabled='disabled'";
         }
         return $class;
