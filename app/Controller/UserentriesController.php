@@ -58,14 +58,14 @@
             $this->Userentry->D->unbindModel(array('hasMany' => array('Playerentry')));
 
             $userentry = $this->Userentry->find('first', array('conditions' => array('week_id' => $weekId, 'user_id' => $this->Auth->user('id'), 'Userentry.year' => Configure::read('current.year')), 'recursive' => 2));
-						$userentry['QB']['locked'] = $this->Player->isPlayerLocked($userentry['QB']['id'], $weekId);
-						$userentry['RB1']['locked'] = $this->Player->isPlayerLocked($userentry['RB1']['id'], $weekId);	
-						$userentry['RB2']['locked'] = $this->Player->isPlayerLocked($userentry['RB2']['id'], $weekId);
-						$userentry['WR1']['locked'] = $this->Player->isPlayerLocked($userentry['WR1']['id'], $weekId);
-						$userentry['WR2']['locked'] = $this->Player->isPlayerLocked($userentry['WR2']['id'], $weekId);
-						$userentry['F']['locked'] = $this->Player->isPlayerLocked($userentry['F']['id'], $weekId);
-						$userentry['K']['locked'] = $this->Player->isPlayerLocked($userentry['K']['id'], $weekId);
-						$userentry['D']['locked'] = $this->Player->isPlayerLocked($userentry['D']['id'], $weekId);
+						if(isset($userentry['QB'])) { $userentry['QB']['locked'] = $this->Player->isPlayerLocked($userentry['QB']['id'], $weekId); }
+						if(isset($userentry['RB1'])) { $userentry['RB1']['locked'] = $this->Player->isPlayerLocked($userentry['RB1']['id'], $weekId); }
+						if(isset($userentry['RB2'])) { $userentry['RB2']['locked'] = $this->Player->isPlayerLocked($userentry['RB2']['id'], $weekId); }
+						if(isset($userentry['WR1'])) { $userentry['WR1']['locked'] = $this->Player->isPlayerLocked($userentry['WR1']['id'], $weekId); }
+						if(isset($userentry['WR2'])) { $userentry['WR2']['locked'] = $this->Player->isPlayerLocked($userentry['WR2']['id'], $weekId); }
+						if(isset($userentry['F'])) { $userentry['F']['locked'] = $this->Player->isPlayerLocked($userentry['F']['id'], $weekId); }
+						if(isset($userentry['K'])) { $userentry['K']['locked'] = $this->Player->isPlayerLocked($userentry['K']['id'], $weekId); }
+						if(isset($userentry['D'])) { $userentry['D']['locked'] = $this->Player->isPlayerLocked($userentry['D']['id'], $weekId); }
             return $userentry;
         }
 
@@ -187,6 +187,7 @@
    }
 
     public function getPlayerData($weekId, $userId, $position, $debug = false) {
+				CakeLog::write('debug', 'Begin getPlayerData');
         //CakeLog::write('debug', "getPlayerData:");
         //CakeLog::write('debug', "weekId: " . $weekId);
         //CakeLog::write('debug', "userId: " . $userId);
@@ -211,27 +212,57 @@
         $buttonId = 0;
         // loop through all the player records and build the json array
         foreach($players[$position] as $player) {
-			CakeLog::write('debug', $position);
+						$playerName = $player['Player']['name'];
+						$previouslyPlayed = isset($userentries[$position][$player['Player']['id']]);
+						if($previouslyPlayed) {
+							$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
+						}
             $opponentID = $this->getOpponentID($player, $schedule);
-            //$espnId = $player['Player']['School']['espn_id'];
-			$espnId = $schools[$player['Player']['school_id']]['espn_id'];
+						$espnId = $schools[$player['Player']['school_id']]['espn_id'];
             $opponent = "";
             if($opponentID != "") {
                 $opponent = '<img src="../../app/webroot/img/logos/' . $schools[$opponentID]['espn_id'] . '.png" title="' . $schools[$opponentID]['name'] . '">';
             }
-
+						
+						$positionLocked = false;
             $button = '';
-            $playerName = $player['Player']['name'].'<br/>'.$this->getPlayerSchool($player);
-			if($userentry['QB']['locked'] != true || $userentry['RB1']['locked'] != true || $userentry['RB2']['locked'] != true || $userentry['WR1']['locked'] != true || $userentry['WR2']['locked'] != true || $userentry['F']['locked'] != true || $userentry['K']['locked'] != true || $userentry['D']['locked'] != true) {
-				if(!isset($userentries[$position][$player['Player']['id']])) {
-					$button = $this->getButton($player, $schedule, $buttonId);
-				} else {
-					$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
-				}
-			}		
-			$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
-
-            array_push($data,
+						switch($position) {
+								case 'QB';
+									if(isset($userentry['QB']) && $userentry['QB']['locked'] == true) {
+										$positionLocked = true;
+									}
+								break;
+								case 'RB';
+									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true)) {
+										$positionLocked = true;
+									}
+								break;
+								case 'WR';
+									if((isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR1']['locked'] == true)) {
+										$positionLocked = true;
+									}
+								break;
+								case 'F';
+									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true) || (isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR1']['locked'] == true)) {
+										$positionLocked = true;
+									}
+								break;
+								case 'K';
+									if(isset($userentry['K']) && $userentry['K']['locked'] == true) {
+										$positionLocked = true;
+									}
+								break;
+								case 'D';
+									if(isset($userentry['D']) && $userentry['D']['locked'] == true) {
+										$positionLocked = true;
+									}
+								break;
+								
+						}
+						$button = $this->getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed);
+						$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
+            
+					array_push($data,
                 array(
                     $player['Player']['id'],
                     $player['Player']['position'],
@@ -261,41 +292,42 @@
             $buttonId++;
         }
         $json = '{"data":'.$this->safe_json_encode($data).'}';
-		//CakeLog::write('debug', "json: " . $json);
+				//CakeLog::write('debug', "json: " . $json);
+				CakeLog::write('debug', 'End getPlayerData');
         return $json;
     }
 
-    private function getButton($player, $schedule, $buttonId) {
-        $buttonLabel = $this->getButtonLabel($player, $schedule);
-        $disabled = $this->getDisabledAttribute($buttonLabel);
-        $button = '<button id="'.$buttonId.'"'.$disabled.' class="select-player">'.$buttonLabel.'</button>';
-        return $button;
+    private function getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed) {
+				$element = '';
+				if(!$previouslyPlayed) {
+					$buttonLabel = $this->getButtonLabel($player, $schedule);
+        	$disabled = $this->getDisabledAttribute($positionLocked);
+					$element = '<button id="'.$buttonId.'"'.$disabled.' class="select-player">'.$buttonLabel.'</button>';
+				}
+				return $element;
     }
 
     private function getButtonLabel($player, $schedule) {
-		$this->Player = ClassRegistry::init('Player');
-        $label = "Locked";
-        if(empty($schedule)) {
-            $label = "Inactive";
-        } else if(isset($schedule[$player['Player']['school_id']])) {
-            $game = $schedule[$player['Player']['school_id']]['Game'];
-			$currentTime = new DateTime();
-			$lockedTime = (new DateTime($game['time']))->modify('-10 minutes');
-			if($currentTime < $lockedTime) {
-				$label = "Select";
-            }
-			//CakeLog::write('debug', 'Player = ' . $player['Player']['name']);
-			//CakeLog::write('debug', 'Current Time = ' . $currentTime->format('Y-m-d H:i:s'));
-			//CakeLog::write('debug', 'Game Time = ' . $lockedTime->format('Y-m-d H:i:s'));
-        } else {
-            $label = "Inactive";
-        }
-        return $label;
+			$this->Player = ClassRegistry::init('Player');
+      $label = "Locked";
+      if(empty($schedule)) {
+      	$label = "Inactive";
+      } else if(isset($schedule[$player['Player']['school_id']])) {
+				$game = $schedule[$player['Player']['school_id']]['Game'];
+				$currentTime = new DateTime();
+				$lockedTime = (new DateTime($game['time']))->modify('-10 minutes');
+				if($currentTime < $lockedTime) {
+					$label = "Select";
+				}
+      } else {
+				$label = "Inactive";
+			}
+      return $label;
     }
 
-    private function getDisabledAttribute($buttonLabel) {
+    private function getDisabledAttribute($positionLocked) {
         $class = '';
-        if('Select' != $buttonLabel) {
+        if($positionLocked) {
             $class = " disabled='disabled'";
         }
         return $class;
@@ -310,13 +342,6 @@
                 $schoolId = $awaySchoolId;
             }
             return $schoolId;
-        }
-        return "";
-    }
-      
-    private function getPlayerSchool($player) {
-        if(isset($player['Player']['School']['name'])) {
-            return $player['Player']['School']['name'];
         }
         return "";
     }

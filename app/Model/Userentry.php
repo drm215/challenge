@@ -144,12 +144,13 @@
 
         public function validatePlayerNotLocked($playerId, $position) {
             $this->Player = ClassRegistry::init('Player');
-            $previous = $this->find('first', array('conditions' => array('id' =>  $this->data['Userentry']['id']), 'recursive' => -1));
-            if($previous['Userentry'][$position] ==  $this->data['Userentry'][$position]) {
-              return true;
-            } else {
-              return !$this->Player->isPlayerLocked($playerId[$position], $this->data['Userentry']['week_id']);
+            if(isset($this->data['Userentry']['id'])) {
+              $previous = $this->find('first', array('conditions' => array('id' =>  $this->data['Userentry']['id']), 'recursive' => -1));  
+              if($previous['Userentry'][$position] ==  $this->data['Userentry'][$position]) {
+                return true; 
+              }
             }
+            return !$this->Player->isPlayerLocked($playerId[$position], $this->data['Userentry']['week_id']);
         }
 
         public function validatePlayerUnique($playerId, $positionOne, $positionTwo, $positionThree) {
@@ -176,7 +177,8 @@
         }
 
         public function calculatePreviousUserEntries($weekId, $playoffFlag, $userId) {
-            $userEntries = $this->find('all', array('conditions' => array('week_id' < $weekId, 'Userentry.playoff_fl' => $playoffFlag, 'user_id' => $userId)));
+            CakeLog::write('debug', 'Begin calculatePreviousUserEntries');
+            $userEntries = $this->find('all', array('conditions' => array('Userentry.week_id < ' => $weekId, 'Userentry.playoff_fl' => $playoffFlag, 'Userentry.user_id' => $userId)));
             $calculatedUserEntries = array();
             foreach($userEntries as $temp) {
                 if(isset($temp['QB']['id'])) {
@@ -210,6 +212,7 @@
                     $calculatedUserEntries['D'][$temp['D']['id']] = $temp['D'];
                 }
             }
+            CakeLog::write('debug', 'End calculatePreviousUserEntries');
             return $calculatedUserEntries;
         }
     }
