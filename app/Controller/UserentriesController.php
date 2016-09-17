@@ -225,7 +225,6 @@
             }
 						
 						$positionLocked = false;
-            $button = '';
 						switch($position) {
 								case 'QB';
 									if(isset($userentry['QB']) && $userentry['QB']['locked'] == true) {
@@ -238,12 +237,12 @@
 									}
 								break;
 								case 'WR';
-									if((isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR1']['locked'] == true)) {
+									if((isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
 										$positionLocked = true;
 									}
 								break;
 								case 'F';
-									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true) || (isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR1']['locked'] == true)) {
+									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true) || (isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
 										$positionLocked = true;
 									}
 								break;
@@ -298,8 +297,9 @@
     }
 
     private function getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed) {
+				CakeLog::write('debug' , 'positionLocked: ' . $positionLocked);
 				$element = '';
-				if(!$previouslyPlayed) {
+				if(!$previouslyPlayed  || $positionLocked) {
 					$buttonLabel = $this->getButtonLabel($player, $schedule);
         	$disabled = $this->getDisabledAttribute($positionLocked, $buttonLabel);
 					$element = '<button id="'.$buttonId.'"'.$disabled.' class="select-player">'.$buttonLabel.'</button>';
