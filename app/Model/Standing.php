@@ -3,13 +3,14 @@
 	
 		public $belongsTo = array("User", "Week");
 		
-		public function calculateStandingsByWeek($weekId = null) {
-			echo "Calculating Standings for Week ".$weekId."\n";
-			if($weekId != null) {
-				
-				$this->Userentry = ClassRegistry::init('Userentry');
-				$this->Playerentry = ClassRegistry::init('Playerentry');
-				$userentries = $this->Userentry->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::read('current.year')), 'recursive' => -1));
+		public function calculateStandingsByWeek() {
+			echo "Calculating Standings for Week\n";
+			$this->Userentry = ClassRegistry::init('Userentry');
+			$this->Playerentry = ClassRegistry::init('Playerentry');
+			$this->Game = ClassRegistry::init('Game');
+			$game = $this->Game->find('first', array('fields' => array('MAX(week_id) AS week_id'), 'recursive' => -1));
+			$weekId = $game[0]['week_id'];
+			$userentries = $this->Userentry->find('all', array('conditions' => array('week_id' => $weekId, 'year' => Configure::read('current.year')), 'recursive' => -1));
 				echo "Found " . count($userentries) . " to calculate.\n";
 				foreach($userentries as $entry) {
 					$playersArray = array($entry['Userentry']['qb_id'],$entry['Userentry']['rb1_id'],$entry['Userentry']['rb2_id'],$entry['Userentry']['wr1_id'],$entry['Userentry']['wr2_id'],$entry['Userentry']['f_id'],$entry['Userentry']['k_id'],$entry['Userentry']['d_id']);				
@@ -33,7 +34,6 @@
 						$this->clear();
 					}
 				}
-			}
 		}
 		
 		public function updateLowestWeek() {

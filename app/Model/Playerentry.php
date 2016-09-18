@@ -3,28 +3,33 @@
     
         public $belongsTo = array("Week", "Player");
         
-        public function espnParser($weekId) {
+        public function espnParser($gameId = null) {
             App::import('Vendor', 'simple_html_dom', array('file'=>'simple_html_dom.php'));
             $this->Player = ClassRegistry::init('Player');
             $this->School = ClassRegistry::init('School');
             $this->Game = ClassRegistry::init('Game');
             
-            $this->espnProcessWeek($weekId);
+            $this->espnProcessWeek($gameId);
             
             $this->Standing = ClassRegistry::init('Standing');
-            $this->Standing->calculateStandingsByWeek($weekId);
+            $this->Standing->calculateStandingsByWeek();
             $this->Standing->updateLowestWeek();
         }
       
-        private function espnProcessWeek($weekId) {
-          echo "Begin espnProcessWeek: " . $weekId . "\n";
+        private function espnProcessWeek($gameId) {
+          echo "Begin espnProcessWeek: " . $gameId . "\n";
           $playerEntries = array();
-          $games = $this->Game->find('all', array('conditions' => array('week_id' => $weekId, 'parsed' => false, 'time < DATE_SUB(NOW(), INTERVAL 3.5 HOUR)'), 'recursive' => -1));
+					$conditions = array('parsed' => false, 'time < DATE_SUB(NOW(), INTERVAL 3.5 HOUR)');
+					if($gameId != '') {
+						$conditions['espn_id'] = $gameId;
+					}
+          $games = $this->Game->find('all', array('conditions' => $conditions, 'recursive' => -1));
           $parsedGames = array();
           $schools = $this->School->find('list', array('conditions' => array('NOT' => array('conference_id' => 0)), 'fields' => array('id')));
           echo "Found " . count($games) . " to process.\n";
           foreach ($games as $game) {
             echo "Processing game id:" . $game['Game']['id'] . " " . $game['Game']['espn_id']."\n";
+						$weekId = $game['Game']['week_id'];
             $espnUrl = "http://www.espn.com/college-football/boxscore?gameId=" . $game['Game']['espn_id'];
             $html = file_get_html($espnUrl);
             // check if the game is final
@@ -241,25 +246,26 @@
         private function espnProcessBoxScoreKickingTable($table, $playerEntries, $weekId, $schoolId) {
           $tbody = $table->find('tbody',0);
           $row = $tbody->find('tr[class=highlight]', 0);
-          
-          $player = $this->Player->find('first', array('conditions' => array('position' => 'K', 'school_id' => $schoolId), 'recursive' => -1));
-          $id = $player['Player']['id'];
-          $playerentry = $this->getPlayerentry($playerEntries, $id, $weekId);
-          $temp = $row->find('td[class=fg]',0);
-          if($temp != null) {
-              $array = explode("/", $temp->plaintext);
-              if(count($array) == 2) {
-                  $playerentry['Playerentry']['field_goals'] = $array[0];
-              }
-          }
-          $temp = $row->find('td[class=xp]',0);
-          if($temp != null) {
-              $array = explode("/", $temp->plaintext);
-              if(count($array) == 2) {
-                  $playerentry['Playerentry']['pat'] = $array[0];
-              }
-          }
-          $playerEntries[$id] = $playerentry;
+					if(count($row) == 1) {
+						$player = $this->Player->find('first', array('conditions' => array('position' => 'K', 'school_id' => $schoolId), 'recursive' => -1));
+						$id = $player['Player']['id'];
+						$playerentry = $this->getPlayerentry($playerEntries, $id, $weekId);
+						$temp = $row->find('td[class=fg]',0);
+						if($temp != null) {
+								$array = explode("/", $temp->plaintext);
+								if(count($array) == 2) {
+										$playerentry['Playerentry']['field_goals'] = $array[0];
+								}
+						}
+						$temp = $row->find('td[class=xp]',0);
+						if($temp != null) {
+								$array = explode("/", $temp->plaintext);
+								if(count($array) == 2) {
+										$playerentry['Playerentry']['pat'] = $array[0];
+								}
+						}
+						$playerEntries[$id] = $playerentry;
+					}
           return $playerEntries;
         }
       
@@ -272,7 +278,7 @@
             if($nameTd != null) {
               $nameLink = $nameTd->find('a', 0);
               if(empty($nameLink)) {
-                echo "Link could not be found.  Dumping contents of td: " . $nameTd->plaintext;
+                //echo "Link could not be found.  Dumping contents of td: " . $nameTd->plaintext;
               } else {
                 $espnId = substr($nameLink->href, strrpos($nameLink->href, "/") + 1);
                 $player = $this->Player->find('first', array('conditions' => array('espn_id' => $espnId), 'recursive' => -1));

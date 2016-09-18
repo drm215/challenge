@@ -34,12 +34,14 @@ class ParserShell extends AppShell {
     }
     
     public function espnParser() {
-        echo "Beginning ESPN Parser\n";
-        echo "Week = ". $this->args[0] . "\n";
-        if(isset($this->args[0])) {
-            $this->Playerentry->espnParser($this->args[0]);
-        }
-        echo "Ending ESPN Parser\n";
+      echo "Beginning ESPN Parser\n";
+			$gameId = '';
+			if(isset($this->args[0])) {
+				$gameId = $this->args[0];
+			}
+			echo "Game ID = ". $gameId . "\n";
+			$this->Playerentry->espnParser($this->args[0]);
+      echo "Ending ESPN Parser\n";
     }
     
     public function playerParser() {
