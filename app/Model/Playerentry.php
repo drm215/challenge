@@ -394,6 +394,7 @@
             $playerEntries['D'] = $this->find('first', array('conditions' => array('week_id' => $userentry['week_id'], 'player_id' => $userentry['d_id']), 'recursive' => $recursive));
             return $playerEntries;
         }
+			
         public function beforeSave($options = array()) {
             if(isset($this->data['Playerentry']['player_id'])) {
                 $points = 0;
@@ -444,5 +445,20 @@
                 $this->data['Playerentry']['points'] = $points;
             }
         }
+			
+			public function getPlayerEntriesKeyed($position) {
+				$this->unbindModel(array('belongsTo' => array('Week')));
+				$data = array();
+				$playerentries = $this->find('all', array('conditions' => array('points >' => '0', 'position' => $position), 'order' => array('week_id'), 'recursive' => 0));
+				foreach($playerentries as $playerentry) {
+					if(isset($data[$playerentry['Playerentry']['player_id']])) {
+
+					} else {
+						$key = $playerentry['Playerentry']['player_id'] . '-' . $playerentry['Playerentry']['week_id'];
+						$data[$key] = $playerentry;
+					}
+				}
+				return $data;
+			}
     }
 ?>

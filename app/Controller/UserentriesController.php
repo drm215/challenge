@@ -139,7 +139,7 @@
         $this->Player = ClassRegistry::init('Player');
         $this->Week = ClassRegistry::init('Week');
         $this->School = ClassRegistry::init('School');
-        $this->Playerentry = ClassRegistry::init('Playerentry');
+				$this->Playerentry = ClassRegistry::init('Playerentry');
 
         $userentry = $this->getUserentry($weekId);
         $players = $this->Player->getAvailablePlayers();
@@ -188,10 +188,6 @@
 
     public function getPlayerData($weekId, $userId, $position, $debug = false) {
 				CakeLog::write('debug', 'Begin getPlayerData');
-        //CakeLog::write('debug', "getPlayerData:");
-        //CakeLog::write('debug', "weekId: " . $weekId);
-        //CakeLog::write('debug', "userId: " . $userId);
-        //CakeLog::write('debug', "position: " . $position);
       
         if(!$debug) {
           $layout = 'ajax'; //<-- No LAYOUT VERY IMPORTANT!!!!!
@@ -201,6 +197,7 @@
         $this->Player = ClassRegistry::init('Player');
         $this->Week = ClassRegistry::init('Week');
         $this->School = ClassRegistry::init('School');
+				$this->Playerentry = ClassRegistry::init('Playerentry');
 
         $userentry = $this->getUserentry($weekId);
         $players = $this->Player->getAvailablePlayers();
@@ -208,6 +205,8 @@
         $schools = $this->School->findAndAdjustIndex();
         $week = $this->Week->find('first', array('conditions' => array('id' => $weekId), 'recursive' => -1));
         $userentries = $this->Userentry->calculatePreviousUserEntries($weekId, $week['Week']['playoff_fl'], $userId);
+				$playerentries = $this->Playerentry->getPlayerEntriesKeyed($position);
+			
         $data = array();
         $buttonId = 0;
         // loop through all the player records and build the json array
@@ -268,7 +267,8 @@
                     $espnId,
                     $button,
 										$teamImage,
-                    $playerName,
+										$this->getPlayerEntryTooltip($playerName, $player, $position, $weekId, $playerentries, $schools),
+                    //'<div id="player-id-' . $player['Player']['id'] . '" class="player-name" title="temp">' . $playerName . "</div>",
                     $opponent,
                     $player[0]['SUM(points)'],
                     $player[0]['SUM(pass_yards)'],
@@ -295,6 +295,54 @@
 				CakeLog::write('debug', 'End getPlayerData');
         return $json;
     }
+			
+		private function getPlayerEntryTooltip($playerName, $player, $position, $weekId, $playerentries, $schools) {
+			$tooltip = "<div id='tooltip-playerentry-info' class='tooltip-player-info'>";
+			$tooltip .= "<h3><img src='../../app/webroot/img/logos/" . $schools[$player['Player']['school_id']]['espn_id'] . ".png' /> " . $player['Player']['name'] . "</h3>";
+			$tooltip .= $player['Player']['position'] . " | " . $schools[$player['Player']['school_id']]['name'];
+			$tooltip .= "</div>";
+			
+			$table = "<table>";
+			$table .= "<thead><tr><th></th>";
+			switch($player['Player']['position']) {
+				case "K":
+					$table .= "<th colspan='2'>Kick</th><th></th></tr><tr><td>Week</td><td>FGs</td><td>PATs</td>";
+					break;
+				case "D":
+					$table .= "<th colspan='5'>Defense</th><th></th></tr><tr><td>Week</td><td>PA</td><td>Fum</td><td>INTs</td><td>TDs</td><td>Safe</td>";
+					break;
+				default:
+					$table .= "<th colspan='2'>Pass</th><th colspan='2'>Rush</th><th colspan='2'>Rec</th><th colspan='2'>Return</th><th></th></tr>";
+					$table .= "<td>Week</td><td>Yards</td><td>TDs</td><td>Yards</td><td>TDs</td><td>Yards</td><td>TDs</td><td>Yards</td><td>TDs</td>";
+					break;
+			}
+			$table .= "<td>Points</td></tr></thead>";
+			$table .= "<tbody>";
+			for($i = 1; $i < $weekId; $i++)	{
+				$table .= "<tr><td>" . $i . "</td>";
+				$key = $player['Player']['id'] . "-" . $i;
+				if(isset($playerentries[$key])) {
+					switch($player['Player']['position']) {
+						case "K":
+							$table .= "<td>" . $playerentries[$key]['Playerentry']['field_goals'] . "</td><td>" . $playerentries[$key]['Playerentry']['pat'] . "</td>";
+							break;
+						case "D":
+							$table .= "<td>" . $playerentries[$key]['Playerentry']['points_allowed'] . "</td><td>" . $playerentries[$key]['Playerentry']['fumble_recovery'] . "</td><td>" . $playerentries[$key]['Playerentry']['def_ints'] . "</td><td>" . $playerentries[$key]['Playerentry']['def_tds'] . "</td><td>" . $playerentries[$key]['Playerentry']['safety'] . "</td>";
+							break;
+						default:
+							$table .= "<td>" . $playerentries[$key]['Playerentry']['pass_yards'] . "</td><td>" . $playerentries[$key]['Playerentry']['pass_tds'] . "</td><td>" . $playerentries[$key]['Playerentry']['rush_yards'] . "</td><td>" . $playerentries[$key]['Playerentry']['rush_tds'] . "</td><td>" . $playerentries[$key]['Playerentry']['receive_yards'] . "</td><td>" . $playerentries[$key]['Playerentry']['receive_tds'] . "</td><td>" . $playerentries[$key]['Playerentry']['return_tds'] . "</td><td>" . $playerentries[$key]['Playerentry']['return_yards'] . "</td>";
+							break;
+					}
+					$table .= "<td>" . $playerentries[$key]['Playerentry']['points'] . "</td>";
+				}
+				
+				$table .= "</tr>";
+			}		
+			$table .= "</tbody>";
+			$table .= "</table>";
+			$tooltip .= $table;
+			return '<div title="' . $tooltip . '">' . $playerName . '</div>';
+		}
 
     private function getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed) {
 				CakeLog::write('debug' , 'positionLocked: ' . $positionLocked);

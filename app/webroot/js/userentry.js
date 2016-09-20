@@ -4,6 +4,7 @@ var playerData = {
     weekId: null,
     userId: null,
     playerentries: null,
+		userentries: null,
     initialize: function(userentry, playerentries, weekId, userId, errors) {
         playerData.weekId = weekId;
         playerData.userId = userId;
@@ -196,7 +197,8 @@ var playerData = {
     },
     selectPlayer: function(id) {
         var data = playerData.data[playerData.getBasePosition($('#hidden-position').val())].data[id];
-        playerData.setSelectedPlayer($('.highlight').attr('id').split('-')[0], data[0], data[5], playerData.getTooltip($('#hidden-position').val(), id));
+	      var name = data[5].replace(/<(?:.|\n)*?>/gm, '');
+        playerData.setSelectedPlayer($('.highlight').attr('id').split('-')[0], data[0], name.substr(name.indexOf('">') + 2), playerData.getTooltip($('#hidden-position').val(), id));
         playerData.validatePlayersUnique();
     },
     triggerErrors: function() {
