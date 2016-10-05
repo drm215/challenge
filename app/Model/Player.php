@@ -73,7 +73,7 @@
 						$this->unbindModel(array('belongsTo' => array('School')));
             $tempPlayerEntries = $this->Playerentry->find('all',
                 array(
-                    'conditions' => array('position' => $position, 'Player.year' => Configure::read('current.year')),
+                    'conditions' => array('position' => $position, 'Player.year' => Configure::read('current.year'), 'points > 0'),
                     'fields' => array('SUM(points)',
                         'SUM(pass_yards)','SUM(pass_tds)',
                         'SUM(rush_yards)','SUM(rush_tds)',

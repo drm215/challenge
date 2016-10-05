@@ -106,5 +106,10 @@ CakeLog::config('error', array(
 	'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
 	'file' => 'error',
 ));
+CakeLog::config('sql', array(
+	'engine' => 'File',
+	'types' => array('sql'),
+	'file' => 'sql',
+));
 
 Configure::write('current.year','2016');

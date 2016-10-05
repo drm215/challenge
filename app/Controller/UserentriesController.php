@@ -268,7 +268,6 @@
                     $button,
 										$teamImage,
 										$this->getPlayerEntryTooltip($playerName, $player, $position, $weekId, $playerentries, $schools),
-                    //'<div id="player-id-' . $player['Player']['id'] . '" class="player-name" title="temp">' . $playerName . "</div>",
                     $opponent,
                     $player[0]['SUM(points)'],
                     $player[0]['SUM(pass_yards)'],
@@ -291,7 +290,6 @@
             $buttonId++;
         }
         $json = '{"data":'.$this->safe_json_encode($data).'}';
-				//CakeLog::write('debug', "json: " . $json);
 				CakeLog::write('debug', 'End getPlayerData');
         return $json;
     }
@@ -345,7 +343,6 @@
 		}
 
     private function getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed) {
-				CakeLog::write('debug' , 'positionLocked: ' . $positionLocked);
 				$element = '';
 				if(!$previouslyPlayed  || $positionLocked) {
 					$buttonLabel = $this->getButtonLabel($player, $schedule);
