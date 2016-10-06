@@ -1,4 +1,7 @@
 <?php
+    /**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
     class Userentry extends AppModel {
 
         public $belongsTo = array(

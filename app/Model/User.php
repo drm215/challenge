@@ -2,6 +2,9 @@
 	App::uses('AppModel', 'Model');
 	App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
 	
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
 	class User extends AppModel {
 		
 		 public $validate = array(
@@ -18,7 +21,7 @@
 
 			'password' => array(
 				'required' => array(
-					'rule' => array('notEmpty'),
+					'rule' => array('notBlank'),
 					'message' => 'A password is required'
 				),
 				'passwordverify' => array( 
@@ -59,14 +62,12 @@
 		}
 		
 		function identicalFieldValues($field = array(), $compare_field = null) { 
-			foreach( $field as $key => $value ){ 
+			foreach( $field as $value ){ 
 				$v1 = $value; 
 				$v2 = $this->data[$this->name][ $compare_field ];     
 				if($v1 !== $v2) { 
 					return FALSE; 
-				} else { 
-					continue; 
-				} 
+				}
 			} 
 			return TRUE; 
 		}
@@ -74,7 +75,6 @@
 		public function updateUserWins() {
 			$this->updateAll(array('wins' => 0));
 			
-			$wins = array();
 			$this->Week = ClassRegistry::init('Week');
 			$this->Standing = ClassRegistry::init('Standing');
 			$weeks = $this->Week->find('list', array('fields' => array('id')));

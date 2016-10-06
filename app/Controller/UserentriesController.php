@@ -1,4 +1,8 @@
 <?php
+
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
     class UserentriesController extends AppController {
 
         public function index() {
@@ -7,11 +11,9 @@
             $data = array();
             $this->Playerentry = ClassRegistry::init('Playerentry');
             foreach ($records as $record) {
-                $weekId = $record['Week']['id'];
-                $UserId = $this->Auth->user('id');
 
                 $playersArray = array($record['Userentry']['qb_id'],$record['Userentry']['rb1_id'],$record['Userentry']['rb2_id'],$record['Userentry']['wr1_id'],$record['Userentry']['wr2_id'],$record['Userentry']['f_id'],$record['Userentry']['k_id'],$record['Userentry']['d_id']);
-                $record['Playerentry'] = $this->Playerentry->getTotalPointsByWeek($weekId, $playersArray);
+                $record['Playerentry'] = $this->Playerentry->getTotalPointsByWeek($record['Week']['id'], $playersArray);
 
                 array_push($data, $record);
             }
@@ -69,20 +71,6 @@
             return $userentry;
         }
 
-        public function view($UserId) {
-            if (!$UserId) {
-                throw new NotFoundException(__('Invalid User'));
-            }
-
-            $this->Userentry->User->recursive=-1;
-            $User = $this->Userentry->User->findById($UserId, array('name', 'owner'));
-            $this->set('title', $User['User']['name']." (".$User['User']['owner'].")");
-
-            $this->Standing = ClassRegistry::init('Standing');
-            $this->Standing->unbindModel(array('belongsTo' => array('User')));
-            $this->set('records', $this->Standing->find('all', array('conditions' => array('user_id' => $UserId/* , 'Week.lock_time < NOW()' */, 'year' => Configure::read('current.year')))));
-        }
-
     public function detail($UserId, $weekId) {
         if (!$UserId) {
             throw new NotFoundException(__('Invalid User'));
@@ -93,29 +81,29 @@
 
         $this->Week = ClassRegistry::init('Week');
         $this->Playerentry = ClassRegistry::init('Playerentry');
-				$this->School = ClassRegistry::init('School');
-				$this->Player = ClassRegistry::init('Player');
+		$this->School = ClassRegistry::init('School');
+		$this->Player = ClassRegistry::init('Player');
 
         $record = $this->Userentry->find('first', array('conditions' => array('user_id' => $UserId, 'week_id' => $weekId, 'Userentry.year' => Configure::read('current.year'))));
-				if($this->Auth->user('id') == $UserId) {
-					$record['QB']['locked'] = 1;
-					$record['RB1']['locked'] = 1;
-					$record['RB2']['locked'] = 1;
-					$record['WR1']['locked'] = 1;
-					$record['WR2']['locked'] = 1;
-					$record['F']['locked'] = 1;
-					$record['K']['locked'] = 1;
-					$record['D']['locked'] = 1;
-				} else {
-					$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], $weekId);
-					$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], $weekId);	
-					$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], $weekId);
-					$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], $weekId);
-					$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], $weekId);
-					$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], $weekId);
-					$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], $weekId);
-					$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], $weekId);
-				}
+		if($this->Auth->user('id') == $UserId) {
+			$record['QB']['locked'] = 1;
+			$record['RB1']['locked'] = 1;
+			$record['RB2']['locked'] = 1;
+			$record['WR1']['locked'] = 1;
+			$record['WR2']['locked'] = 1;
+			$record['F']['locked'] = 1;
+			$record['K']['locked'] = 1;
+			$record['D']['locked'] = 1;
+		} else {
+			$record['QB']['locked'] = $this->Player->isPlayerLocked($record['QB']['id'], $weekId);
+			$record['RB1']['locked'] = $this->Player->isPlayerLocked($record['RB1']['id'], $weekId);	
+			$record['RB2']['locked'] = $this->Player->isPlayerLocked($record['RB2']['id'], $weekId);
+			$record['WR1']['locked'] = $this->Player->isPlayerLocked($record['WR1']['id'], $weekId);
+			$record['WR2']['locked'] = $this->Player->isPlayerLocked($record['WR2']['id'], $weekId);
+			$record['F']['locked'] = $this->Player->isPlayerLocked($record['F']['id'], $weekId);
+			$record['K']['locked'] = $this->Player->isPlayerLocked($record['K']['id'], $weekId);
+			$record['D']['locked'] = $this->Player->isPlayerLocked($record['D']['id'], $weekId);
+		}
 				
 
         $this->set('title', $record['User']['name']." (".$record['User']['owner'].") - Week ".$record['Week']['name']);
@@ -128,7 +116,7 @@
         $points = $this->Playerentry->getTotalPointsByWeek($record['Userentry']['week_id'], $playersArray);
         $calculatedPoints = $points['points'] == "" ? "0" : $points['points'];
         $this->set('totalPoints', $calculatedPoints);
-				$this->set('schools', $this->School->findAndAdjustIndex());
+		$this->set('schools', $this->School->findAndAdjustIndex());
     }
 
     public function beforeFilter() {
@@ -182,10 +170,6 @@
         $this->set('playerentries', json_encode($playerentries, JSON_HEX_APOS));
     }
       
-   public function getPlayerDataDebug($weekId, $userId, $position) {
-    return $this->getPlayerData($weekId, $userId, $position, true);     
-   }
-
     public function getPlayerData($weekId, $userId, $position, $debug = false) {
 				CakeLog::write('debug', 'Begin getPlayerData');
       
@@ -267,7 +251,7 @@
                     $espnId,
                     $button,
 										$teamImage,
-										$this->getPlayerEntryTooltip($playerName, $player, $position, $weekId, $playerentries, $schools),
+										$this->getPlayerEntryTooltip($playerName, $player, $weekId, $playerentries, $schools),
                     $opponent,
                     $player[0]['SUM(points)'],
                     $player[0]['SUM(pass_yards)'],
@@ -294,7 +278,7 @@
         return $json;
     }
 			
-		private function getPlayerEntryTooltip($playerName, $player, $position, $weekId, $playerentries, $schools) {
+		private function getPlayerEntryTooltip($playerName, $player, $weekId, $playerentries, $schools) {
 			$tooltip = "<div id='tooltip-playerentry-info' class='tooltip-player-info'>";
 			$tooltip .= "<h3><img src='../../app/webroot/img/logos/" . $schools[$player['Player']['school_id']]['espn_id'] . ".png' /> " . $player['Player']['name'] . "</h3>";
 			$tooltip .= $player['Player']['position'] . " | " . $schools[$player['Player']['school_id']]['name'];
@@ -390,10 +374,5 @@
         }
         return "";
     }
-
-      public function test() {
-        $playerData = $this->getPlayerData(14, 1, 'QB', true);
-        pr($playerData);
-      }
 }
 ?>

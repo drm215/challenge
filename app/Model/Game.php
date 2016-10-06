@@ -1,4 +1,8 @@
 <?php
+
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
     class Game extends AppModel {
 
         public $hasMany = array('Week');
@@ -115,11 +119,6 @@
 						$date = (new DateTime(substr($wordyDate, $start, $end - $start), new DateTimeZone("America/New_York")))->modify('-4 hours');
 						echo $date->format(DATE_RSS);
 						return $date->format('Y-m-d H:i:s');
-        }
-
-        private function switchMonth($text) {
-            $date = date_parse($text);
-            return str_pad($date['month'], 2, "0", STR_PAD_LEFT);
         }
 
         public function getGamesByWeek($weekId) {

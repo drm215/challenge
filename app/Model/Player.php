@@ -1,4 +1,8 @@
 <?php
+
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
     class Player extends AppModel {
 
         public $belongsTo = array('School');
@@ -12,43 +16,20 @@
 							$currentTime = new DateTime();
 						}
             $this->Game = ClassRegistry::init('Game');
-			
-			//CakeLog::write('debug', "Begin isPlayerLocked");
-
+					
             $this->unbindModel(array('hasMany' => array('Playerentry')));
             $this->School->unbindModel(array('hasMany' => array('Player')));
             $player = $this->find('first', array('conditions' => array('Player.id' => $id), 'recursive' => 0));
             if(!empty($player)) {
-                $school = $player['School'];
-
                 $game = $this->Game->find('first', array('recursive' => -1, 'conditions' => array('week_id' => $weekId, 'OR' => array('away_school_id' => $player['School']['id'], 'home_school_id' => $player['School']['id']))));
                 if(!empty($game)) {
-                    //$lockedTime = strtotime($game['Game']['time']) + (10 * 60) - (4 * 60 * 60);
-					$lockedTime = (new DateTime($game['Game']['time']))->modify('-10 minutes');//->modify('-4 hours');
-					
-					//CakeLog::write('debug', );
-					//CakeLog::write('debug', 'Player = ' . $player['Player']['name']);
-					//CakeLog::write('debug', 'Current Time = ' . $currentTime->format('Y-m-d H:i:s'));
-					//CakeLog::write('debug', 'Game Time = ' . $lockedTime->format('Y-m-d H:i:s'));
-                    if($currentTime > $lockedTime) {
-                        return true;
-                    }
+									$lockedTime = (new DateTime($game['Game']['time']))->modify('-10 minutes');//->modify('-4 hours');
+                  if($currentTime > $lockedTime) {
+                  	return true;
+                  }
                 }
             }
             return false;
-        }
-
-        public function getPlayers($position, $userId, $weekId, $playoffFlag) {
-            $this->Game = ClassRegistry::init('Game');
-            $this->Userentry = ClassRegistry::init('Userentry');
-            $this->School = ClassRegistry::init('School');
-
-            $players = $this->getAvailablePlayers();
-            $schools = $this->School->find('list', array('recursive' => -1));
-            $schedule = $this->Game->getGamesByWeek($weekId);
-            $userentries = $this->Userentry->calculatePreviousUserEntries($weekId, $playoffFlag, $userId);
-            $playerData = $this->printPlayersData($players, $userentries, $schedule, $schools);
-            return $playerData;
         }
       
       public function getAvailablePlayers() {

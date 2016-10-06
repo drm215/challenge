@@ -1,4 +1,8 @@
 <?php
+
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
 	class Standing extends AppModel {
 	
 		public $belongsTo = array("User", "Week");
@@ -22,16 +26,13 @@
 						$standing['Standing']['week_id'] = $weekId;
 						$standing['Standing']['year'] = Configure::read('current.year');
 					}
+					$standing['Standing']['points'] = 0;
 					if(isset($points['points'])) {
 						$standing['Standing']['points'] = $points['points'];
-					} else {
-						$standing['Standing']['points'] = 0;
 					}
 					if(!$this->save($standing)) {
 						echo "Error!\n";
-						
-					} else {
-						$this->clear();
+						return;
 					}
 				}
 		}

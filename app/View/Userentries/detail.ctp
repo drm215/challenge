@@ -1,4 +1,5 @@
 <h3><?php echo $title; ?></h3>
+
 <table>
 	<tr>
 		<th colspan="3">Players</th>
@@ -52,7 +53,7 @@
 		if(isset($player[$position]['locked']) && $player[$position]['locked'] == 1) {
 			echo "<tr><td>".$player[strtoupper($position)]['position']."</td>";
 			echo "<td>".$player[strtoupper($position)]['name']."</td>";
-			echo "<td>".$schools[$playerentries[$position]['Player']['school_id']]['name']."</td>";
+			echo "<td>".$schools[$player[$position]['school_id']]['name']."</td>";
 			printColumn($position, 'pass_yards', $playerentries);
 			printColumn($position, 'pass_tds', $playerentries);
 			printColumn($position, 'rush_yards', $playerentries);

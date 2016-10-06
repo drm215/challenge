@@ -1,6 +1,9 @@
 <?php
 	App::uses('AppController', 'Controller');
 	
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
 	class UsersController extends AppController {
 
 		public function add() {
@@ -19,7 +22,7 @@
 		public function beforeFilter() {
 			parent::beforeFilter();
 			// Allow users to register and logout.
-			$this->Auth->allow('add', 'logout', 'index');
+			$this->Auth->allow('add', 'logout');
 		}
 
 		public function login() {
@@ -33,10 +36,6 @@
 
 		public function logout() {
 			return $this->redirect($this->Auth->logout());
-		}
-		
-		public function index() {
-			// do nothing?
 		}
 	}
 ?>

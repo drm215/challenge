@@ -1,4 +1,8 @@
 <?php
+
+	/**
+        @SuppressWarnings(PHPMD.StaticAccess)
+    */
 	class School extends AppModel {
 
 		public $hasMany = array('Player');
@@ -8,16 +12,6 @@
 			$this->Conference = ClassRegistry::init('Conference', 'Player');
 
 			$this->espnProcessSchools();
-			//$this->espnDownloadImage();
-		}
-
-		private function espnDownloadImage() {
-		    $schools = $this->find('list', array('fields' => ('espn_id')));
-		    foreach($schools as $school) {
-		        $url = "a.espncdn.com/combiner/i?img=/i/teamlogos/ncaa/500/" . $school . ".png&h=25&w=25";
-		        pr($url);
-                file_put_contents("webroot/img/logos/" . $school . ".png", file_get_contents($url));
-		    }
 		}
 
 		private function espnProcessSchools() {
