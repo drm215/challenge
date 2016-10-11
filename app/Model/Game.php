@@ -9,7 +9,7 @@
 
         public function parser($weekId = null) {
             App::import('Vendor', 'simple_html_dom', array('file'=>'simple_html_dom.php'));
-						$this->School = ClassRegistry::init('School');
+			$this->School = ClassRegistry::init('School');
 
             if($weekId == null) {
                 $weeks = $this->Week->find('list');
@@ -26,10 +26,10 @@
             echo "Processing Week " . $weekId . "\n";
             $url = "http://www.espn.com/college-football/schedule/_/week/" . $weekId;
             echo "URL = " . $url . "\n";
-						$html = file_get_html($url);
+			$html = file_get_html($url);
             $this->espnProcessWeekByDays($html, $weekId);
-						$html->clear(); 
-						unset($html);
+			$html->clear(); 
+			unset($html);
         }
 
         private function espnProcessWeekByDays($html, $weekId) {
@@ -49,27 +49,29 @@
         }
 
         private function espnProcessWeekGame($gameTr, $weekId) {
-						pr('begin espnProcessWeekGame');
+			pr('begin espnProcessWeekGame');
             $tds = $gameTr->find('td');
             $awaySchoolId = $this->getSchoolId($tds[0]);
             $homeSchoolId = $this->getSchoolId($tds[1]);
 					
-						$date = $this->processEspnDate($tds[2]->outertext);
+			$date = $this->processEspnDate($tds[2]->outertext);
+			if($date !== FALSE) {
 
-            $existingGame = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
-            if(empty($existingGame)) {
-                $game = $this->create();
-                $game['Game']['away_school_id'] = $awaySchoolId;
-                $game['Game']['home_school_id'] = $homeSchoolId;
-                $game['Game']['week_id'] = $weekId;
-            } else {
-                $game = $existingGame;
-            }
-            $game['Game']['espn_id'] = $this->getEspnId($tds[2]->find('a', 0)->href, "/college-football/game?gameId=");
-            $game['Game']['time'] =  $date;
+				$existingGame = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
+				if(empty($existingGame)) {
+					$game = $this->create();
+					$game['Game']['away_school_id'] = $awaySchoolId;
+					$game['Game']['home_school_id'] = $homeSchoolId;
+					$game['Game']['week_id'] = $weekId;
+				} else {
+					$game = $existingGame;
+				}
+				$game['Game']['espn_id'] = $this->getEspnId($tds[2]->find('a', 0)->href, "/college-football/game?gameId=");
+				$game['Game']['time'] =  $date;
 
-						pr($game);
-            $this->espnSaveGame($game);
+				pr($game);
+				$this->espnSaveGame($game);
+			}
         }
 		
 		private function getSchoolId($td) {
@@ -114,11 +116,14 @@
         }
 
         private function processEspnDate($wordyDate) {
+			if(strpos($wordyDate, 'Postponed') >= 0) {
+				return FALSE;
+			}
             $start = strpos($wordyDate, 'data-date="') + strlen('data-date="');
-						$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
-						$date = (new DateTime(substr($wordyDate, $start, $end - $start), new DateTimeZone("America/New_York")))->modify('-4 hours');
-						echo $date->format(DATE_RSS);
-						return $date->format('Y-m-d H:i:s');
+			$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
+			$date = (new DateTime(substr($wordyDate, $start, $end - $start), new DateTimeZone("America/New_York")))->modify('-4 hours');
+			echo $date->format(DATE_RSS);
+			return $date->format('Y-m-d H:i:s');
         }
 
         public function getGamesByWeek($weekId) {
