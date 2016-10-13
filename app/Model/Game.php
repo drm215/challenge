@@ -55,6 +55,7 @@
             $homeSchoolId = $this->getSchoolId($tds[1]);
 					
 			$date = $this->processEspnDate($tds[2]->outertext);
+			pr('date = ' . $date);
 			if($date !== FALSE) {
 
 				$existingGame = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
@@ -96,7 +97,6 @@
 
         private function getSchoolIdByEspnId($espnId) {
 			pr('begin getSchoolIdByEspnId');
-			pr('$espnId = '.$espnId);
             $school = $this->School->find('first', array('recursive' => -1, 'fields' => array('id'), 'conditions' => array('espn_id' => $espnId)));
             return $school['School']['id'];
         }
@@ -112,13 +112,22 @@
 
         private function getEspnId($espnLink, $prefix) {
             $sPos = strlen($prefix);
-            return substr($espnLink, $sPos, strlen($espnLink) - $sPos);
+			$sEnd = strpos($espnLink, '/', $sPos + 1);
+            return substr($espnLink, $sPos, $sEnd - $sPos);
         }
 
         private function processEspnDate($wordyDate) {
-			if(strpos($wordyDate, 'Postponed') >= 0) {
+			$pos = strpos($wordyDate, 'Postponed');
+			if($pos !== FALSE) {
+				pr('Game is postponed');
 				return FALSE;
 			}
+			$pos = strpos($wordyDate, 'LIVE');
+			if($pos !== FALSE) {
+				pr('Game is Live');
+				return FALSE;
+			}
+			
             $start = strpos($wordyDate, 'data-date="') + strlen('data-date="');
 			$end = strpos($wordyDate, '"', strpos($wordyDate, 'data-date="') + strlen('data-date="') + 1);
 			$date = (new DateTime(substr($wordyDate, $start, $end - $start), new DateTimeZone("America/New_York")))->modify('-4 hours');
