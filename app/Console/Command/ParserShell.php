@@ -69,4 +69,17 @@ class ParserShell extends AppShell {
     public function updateUserWins() {
 		  $this->User->updateUserWins();
 	  }
+	
+	public function updateEspnGameIdParser() {
+        echo "Beginning updateEspnGameIdParser\n";
+        $weekId = null;
+        if(isset($this->args[0])) {
+            $weekId = $this->args[0];
+			$this->Game->updateEspnGameIdParser($weekId);
+        }
+        
+        echo "Ending updateEspnGameIdParser\n";
+    }
+	
+	
 }

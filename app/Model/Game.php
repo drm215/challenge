@@ -6,6 +6,33 @@
     class Game extends AppModel {
 
         public $hasMany = array('Week');
+		
+		public function updateEspnGameIdParser($weekId = null) {
+			App::import('Vendor', 'simple_html_dom', array('file'=>'simple_html_dom.php'));
+			$this->School = ClassRegistry::init('School');
+			 if($weekId !== null) {
+				$url = "http://www.espn.com/college-football/schedule/_/week/" . $weekId;
+				$html = file_get_html($url);
+            	$tables = $html->find('table[class=schedule has-team-logos align-left]');
+            	echo "Found " . count($tables) . " tables to process.\n";
+            	foreach($tables as $table) {
+                	$games = $table->find('tr');
+            		echo "Found " . count($games) . " games to process.\n";
+            		for($i = 1; $i < count($games); $i++) {
+						$tds = $games[$i]->find('td');
+						$awaySchoolId = $this->getSchoolId($tds[0]);
+						$homeSchoolId = $this->getSchoolId($tds[1]);
+						$game = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
+						$game['Game']['espn_id'] = $this->getEspnId($tds[2]->find('a', 0)->href, "/college-football/game?gameId=");
+						pr($game);
+						$this->espnSaveGame($game);
+            		}
+            	}
+				$html->clear(); 
+				unset($html);
+			 }
+			
+		}
 
         public function parser($weekId = null) {
             App::import('Vendor', 'simple_html_dom', array('file'=>'simple_html_dom.php'));
@@ -55,7 +82,6 @@
             $homeSchoolId = $this->getSchoolId($tds[1]);
 					
 			$date = $this->processEspnDate($tds[2]->outertext);
-			pr('date = ' . $date);
 			if($date !== FALSE) {
 
 				$existingGame = $this->find('first', array('recursive' => -1, 'conditions' => array('away_school_id' => $awaySchoolId, 'home_school_id' => $homeSchoolId, 'week_id' => $weekId)));
@@ -113,6 +139,9 @@
         private function getEspnId($espnLink, $prefix) {
             $sPos = strlen($prefix);
 			$sEnd = strpos($espnLink, '/', $sPos + 1);
+			if($sEnd === FALSE) {
+				return substr($espnLink, $sPos);	
+			}
             return substr($espnLink, $sPos, $sEnd - $sPos);
         }
 
