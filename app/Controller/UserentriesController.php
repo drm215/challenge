@@ -170,18 +170,15 @@
         $this->set('playerentries', json_encode($playerentries, JSON_HEX_APOS));
     }
       
-    public function getPlayerData($weekId, $userId, $position, $debug = false) {
-				CakeLog::write('debug', 'Begin getPlayerData');
-      
-        if(!$debug) {
-          $layout = 'ajax'; //<-- No LAYOUT VERY IMPORTANT!!!!!
-          $this->autoRender = false;  // <-- NO RENDER THIS METHOD HAS NO VIEW VERY IMPORTANT!!!!!
-        }
+    public function getPlayerData($weekId, $userId, $basePosition, $position) {
+		CakeLog::write('debug', '$position = ' . $position);
+        $layout = 'ajax'; //<-- No LAYOUT VERY IMPORTANT!!!!!
+        $this->autoRender = false;  // <-- NO RENDER THIS METHOD HAS NO VIEW VERY IMPORTANT!!!!!
       
         $this->Player = ClassRegistry::init('Player');
         $this->Week = ClassRegistry::init('Week');
         $this->School = ClassRegistry::init('School');
-				$this->Playerentry = ClassRegistry::init('Playerentry');
+		$this->Playerentry = ClassRegistry::init('Playerentry');
 
         $userentry = $this->getUserentry($weekId);
         $players = $this->Player->getAvailablePlayers();
@@ -189,17 +186,17 @@
         $schools = $this->School->findAndAdjustIndex();
         $week = $this->Week->find('first', array('conditions' => array('id' => $weekId), 'recursive' => -1));
         $userentries = $this->Userentry->calculatePreviousUserEntries($weekId, $week['Week']['playoff_fl'], $userId);
-				$playerentries = $this->Playerentry->getPlayerEntriesKeyed($position);
+		$playerentries = $this->Playerentry->getPlayerEntriesKeyed($position);
 			
         $data = array();
         $buttonId = 0;
         // loop through all the player records and build the json array
-        foreach($players[$position] as $player) {
-						$playerName = $player['Player']['name'];
-						$previouslyPlayed = isset($userentries[$position][$player['Player']['id']]);
-						if($previouslyPlayed) {
-							$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
-						}
+        foreach($players[$basePosition] as $player) {
+			$playerName = $player['Player']['name'];
+			$previouslyPlayed = isset($userentries[$basePosition][$player['Player']['id']]);
+			if($previouslyPlayed) {
+				$playerName = '<span style="text-decoration:line-through">' . $playerName . '</span>';
+			}
             $opponentID = $this->getOpponentID($player, $schedule);
 						$espnId = $schools[$player['Player']['school_id']]['espn_id'];
             $opponent = "";
@@ -207,42 +204,46 @@
                 $opponent = '<img src="../../app/webroot/img/logos/' . $schools[$opponentID]['espn_id'] . '.png" title="' . $schools[$opponentID]['name'] . '">';
             }
 						
-						$positionLocked = false;
-						switch($position) {
-								case 'QB';
-									if(isset($userentry['QB']) && $userentry['QB']['locked'] == true) {
-										$positionLocked = true;
-									}
-								break;
-								case 'RB';
-									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true)) {
-										$positionLocked = true;
-									}
-								break;
-								case 'WR';
-									if((isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
-										$positionLocked = true;
-									}
-								break;
-								case 'F';
-									if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true) || (isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
-										$positionLocked = true;
-									}
-								break;
-								case 'K';
-									if(isset($userentry['K']) && $userentry['K']['locked'] == true) {
-										$positionLocked = true;
-									}
-								break;
-								case 'D';
-									if(isset($userentry['D']) && $userentry['D']['locked'] == true) {
-										$positionLocked = true;
-									}
-								break;
-								
-						}
-						$button = $this->getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed);
-						$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
+			$positionLocked = false;
+			if(isset($userentry[$position]) && $userentry[$position]['locked'] == true) {
+				$positionLocked = true;
+			}
+			/*
+			switch($basePosition) {
+				case 'QB';
+					if(isset($userentry['QB']) && $userentry['QB']['locked'] == true) {
+						$positionLocked = true;
+					}
+				break;
+				case 'RB';
+					if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true)) {
+						$positionLocked = true;
+					}
+				break;
+				case 'WR';
+					if((isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
+						$positionLocked = true;
+					}
+				break;
+				case 'F';
+					if((isset($userentry['RB1']) && $userentry['RB1']['locked'] == true) || (isset($userentry['RB2']) && $userentry['RB2']['locked'] == true) || (isset($userentry['WR1']) && $userentry['WR1']['locked'] == true) || (isset($userentry['WR2']) && $userentry['WR2']['locked'] == true)) {
+						$positionLocked = true;
+					}
+				break;
+				case 'K';
+					if(isset($userentry['K']) && $userentry['K']['locked'] == true) {
+						$positionLocked = true;
+					}
+				break;
+				case 'D';
+					if(isset($userentry['D']) && $userentry['D']['locked'] == true) {
+						$positionLocked = true;
+					}
+				break;
+
+			}*/
+				$button = $this->getButton($player, $schedule, $buttonId, $positionLocked, $previouslyPlayed);
+				$teamImage = '<img src="../../app/webroot/img/logos/' . $espnId . '.png" title="' . $schools[$player['Player']['school_id']]['name'] . '">';
             
 					array_push($data,
                 array(

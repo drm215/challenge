@@ -13,7 +13,7 @@ var playerData = {
         playerData.errors = errors;
         $('#player-data').DataTable({
             "ajax": {
-                url: playerData.getAjaxUrl(),
+                url: playerData.getAjaxUrl('QB'),
                 complete: function(data) {
                     playerData.data[playerData.getBasePosition($('#hidden-position').val())] = data.responseJSON;
                 }
@@ -64,24 +64,14 @@ var playerData = {
     },
     updatePlayerDataTable: function(position) {
         $('#hidden-position').val(playerData.getBasePosition(position));
-        if(playerData.data[playerData.getBasePosition(position)]) {
-            $('#player-data').DataTable().clear();
-            $('#player-data').DataTable().rows.add(playerData.data[playerData.getBasePosition(position)].data);
-            $('#player-data').DataTable().draw();
-        } else {
-            $('#player-data').DataTable().ajax.url(playerData.getAjaxUrl()).load();
-        }
+        $('#player-data').DataTable().ajax.url(playerData.getAjaxUrl(position)).load();
 
         $('.highlight').removeClass('highlight');
         $('#' + position.toLowerCase() + '-row').addClass('highlight');
         playerData.updateColumnVisibility();
     },
-    getAjaxUrl: function() {
-        console.log('getAjaxUrl');
-        console.log('weekId: ' + playerData.weekId);
-        console.log('userId: ' + playerData.userId);
-        console.log('position: ' + $('#hidden-position').val());
-        return "/userentries/getPlayerData/" + playerData.weekId + "/" + playerData.userId + "/" + $('#hidden-position').val();
+    getAjaxUrl: function(position) {
+        return "/userentries/getPlayerData/" + playerData.weekId + "/" + playerData.userId + "/" + $('#hidden-position').val() + "/" + position;
     },
     getBasePosition: function(position) {
         var basePosition = position;
