@@ -50,9 +50,8 @@
               echo "Skipping because something unexpected happened.\n";
             }
             $html->clear(); 
-						unset($html);
+			unset($html);
           }
-          
           $this->savePlayerEntries($playerEntries, $parsedGames);
           unset($html);
         }
@@ -220,6 +219,7 @@
         }
       
         private function espnProcessBoxScoreContainer($container, $processAway, $processHome, $category, $playerEntries, $weekId) {
+		  echo "espnProcessBoxScoreContainer - " . $category . "\n";
           if($processAway) {
             $div = $container->find('div[class=column-one]', 0);
             $table = $div->find('table[class=mod-data]', 0);
@@ -274,9 +274,11 @@
         }
       
         private function espnProcessBoxScoreTable($table, $category, $playerEntries, $weekId) {
+			echo "espnProcessBoxScoreTable - " . $category . "\n";
           $tbody = $table->find('tbody',0);
           $rows = $tbody->find('tr');
           
+		  echo "espnProcessBoxScoreTable found " . count($rows) . "\n";
           foreach($rows as $row) {
             $nameTd = $row->find('td[class=name]',0);
             if($nameTd != null) {
@@ -284,7 +286,7 @@
               if(empty($nameLink)) {
                 //echo "Link could not be found.  Dumping contents of td: " . $nameTd->plaintext;
               } else {
-                $espnId = substr($nameLink->href, strrpos($nameLink->href, "/") + 1);
+				  $espnId = substr($nameLink->href, strlen("http://www.espn.com/college-football/player/_/id/"), strrpos($nameLink->href, "/") - strlen("http://www.espn.com/college-football/player/_/id/"));
                 $player = $this->Player->find('first', array('conditions' => array('espn_id' => $espnId), 'recursive' => -1));
                 if(empty($player)) {
                   echo "Player " . $nameTd->plaintext . " could not be found in the database. \n";
